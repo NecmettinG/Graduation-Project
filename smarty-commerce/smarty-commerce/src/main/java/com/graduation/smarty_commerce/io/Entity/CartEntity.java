@@ -23,7 +23,7 @@ public class CartEntity {
             inverseJoinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))
     Collection<ProductEntity> products;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 }

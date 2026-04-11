@@ -9,6 +9,8 @@ import java.util.List;
 @Table(name="users")
 public class UserEntity {
 
+    private static final long serialVersionUID = 5313493413859894403L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -25,6 +27,8 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String preferences;
+
     @Column(nullable = false)
     private String encryptedPassword;
 
@@ -39,10 +43,11 @@ public class UserEntity {
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name="users_roles",
             joinColumns = @JoinColumn(name="users_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "roles_id", referencedColumnName = "id"))
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<RoleEntity> roles;
 
-
+    @OneToOne(, mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private CartEntity cart;
 
 
 }

@@ -37,9 +37,6 @@ public class UserEntity {
     @Column(nullable = false)
     private Boolean emailVerificationStatus = false;
 
-    @OneToMany(cascade=CascadeType.ALL, mappedBy = "userDetails", orphanRemoval = true)
-    private List<OrderEntity> orders;
-
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name="users_roles",
             joinColumns = @JoinColumn(name="users_id", referencedColumnName = "id"),
@@ -48,5 +45,8 @@ public class UserEntity {
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private CartEntity cart;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderEntity> orders;
 
 }

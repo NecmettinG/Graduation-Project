@@ -2,6 +2,8 @@ package com.graduation.smarty_commerce.io.Entity;
 
 import jakarta.persistence.*;
 
+import java.util.Collection;
+
 @Entity
 @Table(name = "categories")
 public class CategoryEntity {
@@ -16,7 +18,11 @@ public class CategoryEntity {
     @Column(nullable = false)
     private String categoryName;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @JoinTable(name="category_products",
+            joinColumns = @JoinColumn(name="category_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name="product_id", referencedColumnName = "id")
+    )
     private Collection<ProductEntity> products;
 
 }

@@ -26,7 +26,15 @@ public class ProductEntity {
     private String description;
 
     //map category with product here, many to many, category will be the owner in joint table.
-    @ManyToMany
+
+    @ManyToMany(mappedBy = "products")
     private Collection<CategoryEntity> category;
 
+    //CREATE INTERMEDIATE ENTITY!
+    @ManyToMany(mappedBy = "products")
+    private Collection<OrderEntity> order;
+
+    //CREATE INTERMEDIATE ENTITY!
+    @ManyToMany(mappedBy = "products")
+    private Collection<CartEntity> cart;
 }

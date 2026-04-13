@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name="cart")
@@ -15,13 +16,10 @@ public class CartEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private long currentTotal;
+    private java.math.BigDecimal currentTotal;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    @JoinTable(name="cart-products",
-            joinColumns = @JoinColumn(name = "cart_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))
-    Collection<ProductEntity> products;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cart", orphanRemoval = true)
+    private List<CartItemEntity> cartItems;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")

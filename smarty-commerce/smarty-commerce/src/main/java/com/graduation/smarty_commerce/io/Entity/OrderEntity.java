@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="orders_table") //You have to be careful when you create a table from order entity because jpa is confusing!
@@ -26,16 +27,13 @@ public class OrderEntity {
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
-    private long totalAmount;
+    private java.math.BigDecimal totalAmount;
 
     @Column(nullable = false)
     private String shippingAddress;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    @JoinTable(name="order_products",
-            joinColumns = @JoinColumn(name="order_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name="product_id", referencedColumnName = "id"))
-    private Collection<ProductEntity> products;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
+    private List<OrderItemEntity> orderItems;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

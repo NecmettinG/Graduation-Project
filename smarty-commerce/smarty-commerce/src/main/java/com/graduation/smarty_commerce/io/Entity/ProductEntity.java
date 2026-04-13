@@ -2,6 +2,7 @@ package com.graduation.smarty_commerce.io.Entity;
 
 import jakarta.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -17,7 +18,7 @@ public class ProductEntity {
     private String productName;
 
     @Column(nullable = false)
-    private long price;
+    private java.math.BigDecimal price;
 
     private int stock;
 
@@ -30,11 +31,11 @@ public class ProductEntity {
     @ManyToMany(mappedBy = "products")
     private Collection<CategoryEntity> category;
 
-    //CREATE INTERMEDIATE ENTITY!
-    @ManyToMany(mappedBy = "products")
-    private Collection<OrderEntity> order;
+    //Cascade type all and orphan removal can be deleted!
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true)
+    private List<OrderItemEntity> orderItems;
 
-    //CREATE INTERMEDIATE ENTITY!
-    @ManyToMany(mappedBy = "products")
-    private Collection<CartEntity> cart;
+    //Cascade type all and orphan removal can be deleted!
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true)
+    private List<CartItemEntity> cartItems;
 }

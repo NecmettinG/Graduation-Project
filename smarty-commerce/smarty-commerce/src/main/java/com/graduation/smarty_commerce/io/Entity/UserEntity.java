@@ -39,7 +39,7 @@ public class UserEntity {
 
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name="users_roles",
-            joinColumns = @JoinColumn(name="users_id", referencedColumnName = "id"),
+            joinColumns = @JoinColumn(name="user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<RoleEntity> roles;
 

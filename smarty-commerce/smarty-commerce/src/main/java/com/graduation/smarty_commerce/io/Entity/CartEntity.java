@@ -3,12 +3,14 @@ package com.graduation.smarty_commerce.io.Entity;
 import jakarta.persistence.*;
 
 import java.io.Serial;
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name="cart")
-public class CartEntity {
+public class CartEntity implements Serializable {
 
     private static final long serialVersionUID = 1231295114816925194L;
 
@@ -24,4 +26,36 @@ public class CartEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public BigDecimal getCurrentTotal() {
+        return currentTotal;
+    }
+
+    public void setCurrentTotal(BigDecimal currentTotal) {
+        this.currentTotal = currentTotal;
+    }
+
+    public List<CartItemEntity> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(List<CartItemEntity> cartItems) {
+        this.cartItems = cartItems;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
 }

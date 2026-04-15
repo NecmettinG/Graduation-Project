@@ -2,11 +2,12 @@ package com.graduation.smarty_commerce.io.Entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 @Entity
 @Table(name = "categories")
-public class CategoryEntity {
+public class CategoryEntity implements Serializable {
 
     private static final long serialVersionUID = 5313493413859895455L;
 
@@ -25,4 +26,28 @@ public class CategoryEntity {
     )
     private Collection<ProductEntity> products;
 
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public Collection<ProductEntity> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Collection<ProductEntity> products) {
+        this.products = products;
+    }
 }

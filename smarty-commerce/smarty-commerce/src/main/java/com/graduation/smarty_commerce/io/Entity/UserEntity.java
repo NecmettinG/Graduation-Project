@@ -50,6 +50,9 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderEntity> orders;
 
+    @OneToMany(mappedBy = "userDetails",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AddressEntity> addresses;
+
     public long getId() {
         return id;
     }

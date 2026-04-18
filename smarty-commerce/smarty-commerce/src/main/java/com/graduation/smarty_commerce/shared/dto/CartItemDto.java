@@ -13,6 +13,7 @@ public class CartItemDto implements Serializable {
 
     private long id;
 
+    private String cartItemId;
 
     private CartDto cart;
 
@@ -53,6 +54,14 @@ public class CartItemDto implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public String getCartItemId() {
+        return cartItemId;
+    }
+
+    public void setCartItemId(String cartItemId) {
+        this.cartItemId = cartItemId;
     }
 }
 

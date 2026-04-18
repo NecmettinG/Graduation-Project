@@ -15,6 +15,9 @@ public class OrderItemEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
+    private String orderItemId;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity product;
@@ -67,5 +70,13 @@ public class OrderItemEntity implements Serializable {
 
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public String getOrderItemId() {
+        return orderItemId;
+    }
+
+    public void setOrderItemId(String orderItemId) {
+        this.orderItemId = orderItemId;
     }
 }

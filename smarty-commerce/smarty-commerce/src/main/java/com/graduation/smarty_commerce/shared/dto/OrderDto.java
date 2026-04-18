@@ -17,6 +17,8 @@ public class OrderDto implements Serializable {
 
     private long id;
 
+    private String orderId;
+
     private Date orderDate;
 
     private String userId;
@@ -93,6 +95,14 @@ public class OrderDto implements Serializable {
 
     public void setUser(UserDto user) {
         this.user = user;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }
 

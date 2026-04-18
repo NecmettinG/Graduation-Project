@@ -17,6 +17,9 @@ public class CategoryEntity implements Serializable {
     private long id;
 
     @Column(nullable = false)
+    private String categoryId;
+
+    @Column(nullable = false)
     private String categoryName;
 
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
@@ -49,5 +52,13 @@ public class CategoryEntity implements Serializable {
 
     public void setProducts(Collection<ProductEntity> products) {
         this.products = products;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 }

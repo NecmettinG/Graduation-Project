@@ -14,6 +14,7 @@ public class OrderItemDto implements Serializable {
 
     private long id;
 
+    private String orderItemId;
 
     private ProductDto product;
 
@@ -65,6 +66,14 @@ public class OrderItemDto implements Serializable {
 
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public String getOrderItemId() {
+        return orderItemId;
+    }
+
+    public void setOrderItemId(String orderItemId) {
+        this.orderItemId = orderItemId;
     }
 }
 

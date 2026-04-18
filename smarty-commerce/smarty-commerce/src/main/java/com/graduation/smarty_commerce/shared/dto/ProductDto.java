@@ -17,6 +17,8 @@ public class ProductDto implements Serializable {
 
     private long id;
 
+    private String productId;
+
     private String productName;
 
     private java.math.BigDecimal price;
@@ -104,6 +106,14 @@ public class ProductDto implements Serializable {
 
     public void setCartItems(List<CartItemDto> cartItems) {
         this.cartItems = cartItems;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 }
 

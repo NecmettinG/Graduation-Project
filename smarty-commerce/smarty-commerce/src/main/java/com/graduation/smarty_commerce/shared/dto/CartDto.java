@@ -14,6 +14,8 @@ public class CartDto implements Serializable {
 
     private long id;
 
+    private String cartId;
+
     private java.math.BigDecimal currentTotal;
 
     private List<CartItemDto> cartItems;
@@ -50,6 +52,14 @@ public class CartDto implements Serializable {
 
     public void setUser(UserDto user) {
         this.user = user;
+    }
+
+    public String getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
     }
 }
 

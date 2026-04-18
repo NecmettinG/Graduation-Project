@@ -20,6 +20,9 @@ public class OrderEntity implements Serializable {
     private long id;
 
     @Column(nullable = false)
+    private String orderId;
+
+    @Column(nullable = false)
     private Date orderDate;
 
     @Column(nullable = false)
@@ -103,5 +106,13 @@ public class OrderEntity implements Serializable {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

@@ -17,6 +17,9 @@ public class ProductEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
+    private String productId;
+
     @Column(nullable = false, length = 70)
     private String productName;
 
@@ -112,5 +115,13 @@ public class ProductEntity implements Serializable {
 
     public void setCartItems(List<CartItemEntity> cartItems) {
         this.cartItems = cartItems;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 }

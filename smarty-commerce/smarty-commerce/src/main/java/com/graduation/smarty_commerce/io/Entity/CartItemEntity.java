@@ -14,6 +14,10 @@ public class CartItemEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
+    private String cartItemId;
+
+
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private CartEntity cart;
@@ -55,5 +59,13 @@ public class CartItemEntity implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public String getCartItemId() {
+        return cartItemId;
+    }
+
+    public void setCartItemId(String cartItemId) {
+        this.cartItemId = cartItemId;
     }
 }

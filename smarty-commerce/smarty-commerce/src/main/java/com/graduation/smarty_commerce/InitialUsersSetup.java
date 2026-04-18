@@ -53,16 +53,18 @@ public class InitialUsersSetup {
             return;
         }
 
-        UserEntity adminUser = new UserEntity();
-        adminUser.setFirstName("Boss");
-        adminUser.setLastName("Big Boss");
-        adminUser.setEmail("TheBigBoss@gmail.com");
-        adminUser.setEmailVerificationStatus(true);
-        adminUser.setUserId(utils.generateId(30));
-        adminUser.setEncryptedPassword(bCryptPasswordEncoder.encode("Diamond Dawgs"));
-        adminUser.setRoles(Arrays.asList(roleAdmin));
+        if(userRepository.findByEmail("TheBigBoss@gmail.com") == null) {
+            UserEntity adminUser = new UserEntity();
+            adminUser.setFirstName("Boss");
+            adminUser.setLastName("Big Boss");
+            adminUser.setEmail("TheBigBoss@gmail.com");
+            adminUser.setEmailVerificationStatus(true);
+            adminUser.setUserId(utils.generateId(30));
+            adminUser.setEncryptedPassword(bCryptPasswordEncoder.encode("Diamond Dawgs"));
+            adminUser.setRoles(Arrays.asList(roleAdmin));
 
-        userRepository.save(adminUser);
+            userRepository.save(adminUser);
+        }
     }
 
     @Transactional

@@ -26,7 +26,7 @@ public class UserDto implements Serializable {
 
     private String preferences;
 
-    private String encryptedPassword;
+    private String password;
 
     private String emailVerificationToken;
 
@@ -37,6 +37,8 @@ public class UserDto implements Serializable {
     private CartDto cart;
 
     private List<OrderDto> orders;
+
+    private List<AddressDto> addresses;
 
     public long getId() {
         return id;
@@ -86,12 +88,12 @@ public class UserDto implements Serializable {
         this.preferences = preferences;
     }
 
-    public String getEncryptedPassword() {
-        return encryptedPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setEncryptedPassword(String encryptedPassword) {
-        this.encryptedPassword = encryptedPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEmailVerificationToken() {
@@ -132,6 +134,14 @@ public class UserDto implements Serializable {
 
     public void setOrders(List<OrderDto> orders) {
         this.orders = orders;
+    }
+
+    public List<AddressDto> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressDto> addresses) {
+        this.addresses = addresses;
     }
 }
 

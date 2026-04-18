@@ -26,6 +26,14 @@ public class CategoryDto implements Serializable {
         this.id = id;
     }
 
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public String getCategoryName() {
         return categoryName;
     }
@@ -41,13 +49,4 @@ public class CategoryDto implements Serializable {
     public void setProducts(Collection<ProductDto> products) {
         this.products = products;
     }
-
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
 }
-

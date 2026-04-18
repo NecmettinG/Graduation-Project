@@ -41,7 +41,7 @@ public class OrderEntity implements Serializable {
     private List<OrderItemEntity> orderItems;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "users_id")
     private UserEntity user;
 
     public long getId() {

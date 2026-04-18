@@ -21,7 +21,7 @@ public class OrderDto implements Serializable {
 
     private Date orderDate;
 
-    private String userId;
+    private UserDto user;
 
     private OrderStatus orderStatus;
 
@@ -30,8 +30,6 @@ public class OrderDto implements Serializable {
     private String shippingAddress;
 
     private List<OrderItemDto> orderItems;
-
-    private UserDto user;
 
     public long getId() {
         return id;
@@ -49,12 +47,12 @@ public class OrderDto implements Serializable {
         this.orderDate = orderDate;
     }
 
-    public String getUserId() {
-        return userId;
+    public UserDto getUser() {
+        return user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser(UserDto user) {
+        this.user = user;
     }
 
     public OrderStatus getOrderStatus() {
@@ -89,14 +87,6 @@ public class OrderDto implements Serializable {
         this.orderItems = orderItems;
     }
 
-    public UserDto getUser() {
-        return user;
-    }
-
-    public void setUser(UserDto user) {
-        this.user = user;
-    }
-
     public String getOrderId() {
         return orderId;
     }
@@ -105,4 +95,3 @@ public class OrderDto implements Serializable {
         this.orderId = orderId;
     }
 }
-

@@ -27,7 +27,7 @@ public class UserController {
 //    @Autowired
 //    AddressServiceImpl addressService;
 
-    //@PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userId")
+    @PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userId")
     @GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public UserRest getUser(@PathVariable("id") String id){
 

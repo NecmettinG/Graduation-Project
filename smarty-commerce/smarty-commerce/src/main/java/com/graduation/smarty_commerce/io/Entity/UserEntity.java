@@ -148,4 +148,12 @@ public class UserEntity implements Serializable {
     public void setOrders(List<OrderEntity> orders) {
         this.orders = orders;
     }
+
+    public List<AddressEntity> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressEntity> addresses) {
+        this.addresses = addresses;
+    }
 }

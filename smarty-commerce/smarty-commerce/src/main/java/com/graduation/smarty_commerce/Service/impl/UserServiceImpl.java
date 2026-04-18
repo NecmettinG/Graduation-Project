@@ -12,6 +12,7 @@ import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.AddressDto;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -117,6 +118,23 @@ public class UserServiceImpl implements UserService {
 
 
         //amazonSES.verifyEmail(returnValue);
+
+        return returnValue;
+    }
+
+    @Override
+    public UserDto getUser(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        if(userEntity == null){
+            throw new UsernameNotFoundException("email not found:" + email);
+        }
+
+        UserDto returnValue = new UserDto();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        returnValue = modelMapper.map(userEntity, UserDto.class);
 
         return returnValue;
     }

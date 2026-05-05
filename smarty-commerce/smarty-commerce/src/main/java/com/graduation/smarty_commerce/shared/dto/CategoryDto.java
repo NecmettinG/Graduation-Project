@@ -16,6 +16,8 @@ public class CategoryDto implements Serializable {
 
     private String categoryName;
 
+    private MainCategoryDto mainCategory;
+
     private Collection<ProductDto> products;
 
     public long getId() {
@@ -40,6 +42,14 @@ public class CategoryDto implements Serializable {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public MainCategoryDto getMainCategory() {
+        return mainCategory;
+    }
+
+    public void setMainCategory(MainCategoryDto mainCategory) {
+        this.mainCategory = mainCategory;
     }
 
     public Collection<ProductDto> getProducts() {

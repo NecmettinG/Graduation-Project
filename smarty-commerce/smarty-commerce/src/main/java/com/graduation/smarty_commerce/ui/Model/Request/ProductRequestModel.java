@@ -17,7 +17,7 @@ public class ProductRequestModel {
 
     private String description;
 
-    private List<String> categoryIds;
+    private String categoryId;
 
     public String getProductName() {
         return productName;
@@ -59,11 +59,11 @@ public class ProductRequestModel {
         this.description = description;
     }
 
-    public List<String> getCategoryIds() {
-        return categoryIds;
+    public String getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryIds(List<String> categoryIds) {
-        this.categoryIds = categoryIds;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 }

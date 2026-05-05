@@ -32,10 +32,9 @@ public class ProductEntity implements Serializable {
 
     private String description;
 
-    //map category with product here, many to many, category will be the owner in joint table.
-
-    @ManyToMany(mappedBy = "products")
-    private Collection<CategoryEntity> category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
 
     //Cascade type all and orphan removal can be deleted!
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true)
@@ -93,11 +92,11 @@ public class ProductEntity implements Serializable {
         this.description = description;
     }
 
-    public Collection<CategoryEntity> getCategory() {
+    public CategoryEntity getCategory() {
         return category;
     }
 
-    public void setCategory(Collection<CategoryEntity> category) {
+    public void setCategory(CategoryEntity category) {
         this.category = category;
     }
 

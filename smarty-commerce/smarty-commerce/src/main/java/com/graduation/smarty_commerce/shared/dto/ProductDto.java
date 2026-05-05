@@ -29,7 +29,7 @@ public class ProductDto implements Serializable {
 
     private String description;
 
-    private Collection<CategoryDto> category;
+    private CategoryDto category;
 
     private List<OrderItemDto> orderItems;
 
@@ -84,11 +84,11 @@ public class ProductDto implements Serializable {
         this.description = description;
     }
 
-    public Collection<CategoryDto> getCategory() {
+    public CategoryDto getCategory() {
         return category;
     }
 
-    public void setCategory(Collection<CategoryDto> category) {
+    public void setCategory(CategoryDto category) {
         this.category = category;
     }
 

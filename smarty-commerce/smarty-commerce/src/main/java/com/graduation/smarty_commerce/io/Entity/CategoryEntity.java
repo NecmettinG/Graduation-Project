@@ -22,13 +22,12 @@ public class CategoryEntity implements Serializable {
     @Column(nullable = false)
     private String categoryName;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
-    @JoinTable(name="category_products",
-            joinColumns = @JoinColumn(name="category_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name="product_id", referencedColumnName = "id")
-    )
-    private Collection<ProductEntity> products;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "main_category_id")
+    private MainCategoryEntity mainCategory;
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Collection<ProductEntity> products;
 
     public long getId() {
         return id;
@@ -60,5 +59,13 @@ public class CategoryEntity implements Serializable {
 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public MainCategoryEntity getMainCategory() {
+        return mainCategory;
+    }
+
+    public void setMainCategory(MainCategoryEntity mainCategory) {
+        this.mainCategory = mainCategory;
     }
 }

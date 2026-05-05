@@ -1,9 +1,11 @@
 package com.graduation.smarty_commerce.ui.Model.Response;
 
-public class CategoryRest {
+import java.util.List;
+
+public class MainCategoryRest {
     private String categoryId;
     private String categoryName;
-    private MainCategoryRest mainCategory;
+    private List<CategoryRest> subCategories;
 
     public String getCategoryId() {
         return categoryId;
@@ -21,11 +23,12 @@ public class CategoryRest {
         this.categoryName = categoryName;
     }
 
-    public MainCategoryRest getMainCategory() {
-        return mainCategory;
+    public List<CategoryRest> getSubCategories() {
+        return subCategories;
     }
 
-    public void setMainCategory(MainCategoryRest mainCategory) {
-        this.mainCategory = mainCategory;
+    public void setSubCategories(List<CategoryRest> subCategories) {
+        this.subCategories = subCategories;
     }
 }
+

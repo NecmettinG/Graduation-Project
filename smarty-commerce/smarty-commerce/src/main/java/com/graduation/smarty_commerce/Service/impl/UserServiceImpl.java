@@ -11,16 +11,23 @@ import com.graduation.smarty_commerce.io.Repository.UserRepository;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.AddressDto;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
+import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -45,6 +52,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public UserDto getUserByUserId(String userId){
 
         UserEntity userEntity = userRepository.findByUserId(userId);
@@ -122,7 +130,15 @@ public class UserServiceImpl implements UserService {
         return returnValue;
     }
 
+    //When you tried to login, ModelMapper was trying to map the UserEntity to UserDto in UserServiceImpl.getUser(String email) which is-
+    //-called in AuthenticationFilter upon successful authentication. Because your UserEntity has related entities (like @OneToMany for-
+    //-addresses and orders) combined with the default fetch type being LAZY, the ModelMapper couldn't access these collections because
+    //-it was executing outside of an active database session. And LazyInitializationException was thrown, resulting in an HTTP 500 error.
+
+    //By adding the @Transactional annotation, you ensure that the Hibernate session remains open for the duration of the method-
+    // -so that the collections can be fully lazily initialized when ModelMapper builds out UserDto.
     @Override
+    @Transactional
     public UserDto getUser(String email) {
         UserEntity userEntity = userRepository.findByEmail(email);
 
@@ -140,6 +156,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserDto> getUsers(int page, int limit){
+
+        List<UserDto> returnValue = new ArrayList<>();
+
+        if(page>0){
+
+            page -=1;
+        }
+
+        else{
+
+            throw new UserServiceException(ErrorMessages.INVALID_PAGE_NUMBER.getErrorMessage());
+        }
+
+        Pageable pageableRequest = PageRequest.of(page, limit);
+
+        Page<UserEntity> usersPage = userRepository.findAll(pageableRequest);
+
+        List<UserEntity> users = usersPage.getContent();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for(UserEntity userEntity : users){
+
+            UserDto userDto = new UserDto();
+
+            userDto = modelMapper.map(userEntity, UserDto.class);
+
+            returnValue.add(userDto);
+        }
+
+        return returnValue;
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         UserEntity userEntity = userRepository.findByEmail(username);
@@ -152,4 +203,5 @@ public class UserServiceImpl implements UserService {
 
         return new UserPrincipal(userEntity);
     }
+
 }

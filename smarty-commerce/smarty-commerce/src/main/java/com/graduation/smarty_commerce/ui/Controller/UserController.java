@@ -9,13 +9,17 @@ import com.graduation.smarty_commerce.ui.Model.Request.UserDetailsRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import com.graduation.smarty_commerce.ui.Model.Response.UserRest;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -38,6 +42,29 @@ public class UserController {
         ModelMapper modelMapper = new ModelMapper();
 
         returnValue = modelMapper.map(userDto, UserRest.class);
+
+        return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
+                                   @RequestParam(value = "limit", defaultValue = "25") int limit) {
+
+        List<UserRest> returnValue = new ArrayList<>();
+
+        List<UserDto> users = userService.getUsers(page, limit);
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (UserDto userDto : users) {
+
+            UserRest userModel = new UserRest();
+
+            userModel = modelMapper.map(userDto, UserRest.class);
+
+            returnValue.add(userModel);
+        }
 
         return returnValue;
     }

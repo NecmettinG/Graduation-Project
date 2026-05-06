@@ -3,6 +3,7 @@ package com.graduation.smarty_commerce.Service.impl;
 import com.graduation.smarty_commerce.Exceptions.UserServiceException;
 import com.graduation.smarty_commerce.Security.UserPrincipal;
 import com.graduation.smarty_commerce.Service.UserService;
+import com.graduation.smarty_commerce.io.Entity.AddressEntity;
 import com.graduation.smarty_commerce.io.Entity.RoleEntity;
 import com.graduation.smarty_commerce.io.Entity.UserEntity;
 import com.graduation.smarty_commerce.io.Repository.PasswordResetTokenRepository;
@@ -186,6 +187,46 @@ public class UserServiceImpl implements UserService {
 
             returnValue.add(userDto);
         }
+
+        return returnValue;
+    }
+
+    @Override
+    public UserDto updateUser(String userId, UserDto user){
+
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        if(userEntity == null){
+
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        }
+
+        if (user.getFirstName() != null) {
+            userEntity.setFirstName(user.getFirstName());
+        }
+        if (user.getLastName() != null) {
+            userEntity.setLastName(user.getLastName());
+        }
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        }
+
+        if (user.getAddresses() != null) {
+            userEntity.getAddresses().clear();
+            ModelMapper modelMapper = new ModelMapper();
+            for (AddressDto addressDto : user.getAddresses()) {
+                addressDto.setAddressId(utils.generateId(30));
+                addressDto.setUserDetails(modelMapper.map(userEntity, UserDto.class));
+                AddressEntity addressEntity = modelMapper.map(addressDto, AddressEntity.class);
+                addressEntity.setUserDetails(userEntity);
+                userEntity.getAddresses().add(addressEntity);
+            }
+        }
+
+        UserEntity updatedUserDetails = userRepository.save(userEntity);
+
+        ModelMapper modelMapper = new ModelMapper();
+        UserDto returnValue = modelMapper.map(updatedUserDetails, UserDto.class);
 
         return returnValue;
     }

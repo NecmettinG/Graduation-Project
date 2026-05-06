@@ -93,4 +93,25 @@ public class UserController {
 
         return returnValue;
     }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @PutMapping(
+            path = "/{id}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    )
+    public UserRest updateUser(@RequestBody UserDetailsRequestModel userDetails, @PathVariable("id") String id) {
+
+        UserDto userDto = new UserDto();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        userDto = modelMapper.map(userDetails, UserDto.class);
+
+        UserDto updatedUser = userService.updateUser(id, userDto);
+
+        UserRest returnValue = modelMapper.map(updatedUser, UserRest.class);
+
+        return returnValue;
+    }
 }

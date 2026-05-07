@@ -6,8 +6,7 @@ import com.graduation.smarty_commerce.Service.impl.UserServiceImpl;
 import com.graduation.smarty_commerce.shared.Roles;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
 import com.graduation.smarty_commerce.ui.Model.Request.UserDetailsRequestModel;
-import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
-import com.graduation.smarty_commerce.ui.Model.Response.UserRest;
+import com.graduation.smarty_commerce.ui.Model.Response.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +110,22 @@ public class UserController {
         UserDto updatedUser = userService.updateUser(id, userDto);
 
         UserRest returnValue = modelMapper.map(updatedUser, UserRest.class);
+
+        return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel deleteUser(@PathVariable("id") String id) {
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+
+
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+
+        userService.deleteUser(id);
+
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 
         return returnValue;
     }

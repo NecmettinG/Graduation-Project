@@ -196,6 +196,8 @@ public class UserServiceImpl implements UserService {
 
         UserEntity userEntity = userRepository.findByUserId(userId);
 
+        ModelMapper modelMapper = new ModelMapper();
+
         if(userEntity == null){
 
             throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
@@ -213,7 +215,7 @@ public class UserServiceImpl implements UserService {
 
         if (user.getAddresses() != null) {
             userEntity.getAddresses().clear();
-            ModelMapper modelMapper = new ModelMapper();
+
             for (AddressDto addressDto : user.getAddresses()) {
                 addressDto.setAddressId(utils.generateId(30));
                 addressDto.setUserDetails(modelMapper.map(userEntity, UserDto.class));
@@ -225,10 +227,22 @@ public class UserServiceImpl implements UserService {
 
         UserEntity updatedUserDetails = userRepository.save(userEntity);
 
-        ModelMapper modelMapper = new ModelMapper();
         UserDto returnValue = modelMapper.map(updatedUserDetails, UserDto.class);
 
         return returnValue;
+    }
+
+    @Override
+    public void deleteUser(String userId){
+
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        if(userEntity == null){
+
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        }
+
+        userRepository.delete(userEntity);
     }
 
     @Override

@@ -8,4 +8,5 @@ public interface AddressService {
 
     public List<AddressDto> getAddresses(String userId);
     public AddressDto getAddress(String addressId);
+    public AddressDto createAddress(String userId ,AddressDto addressDto);
 }

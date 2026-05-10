@@ -1,10 +1,12 @@
 package com.graduation.smarty_commerce.Service.impl;
 
+import com.graduation.smarty_commerce.Exceptions.UserServiceException;
 import com.graduation.smarty_commerce.Service.AddressService;
 import com.graduation.smarty_commerce.io.Entity.AddressEntity;
 import com.graduation.smarty_commerce.io.Entity.UserEntity;
 import com.graduation.smarty_commerce.io.Repository.AddressRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
+import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.AddressDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class AddressServiceImpl implements AddressService {
     
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    Utils utils;
 
     @Override
     public List<AddressDto> getAddresses(String userId){
@@ -54,6 +59,35 @@ public class AddressServiceImpl implements AddressService {
 
             returnValue = new ModelMapper().map(addressEntity, AddressDto.class);
         }
+
+        return returnValue;
+    }
+
+    @Override
+    public AddressDto createAddress(String userId ,AddressDto addressDto){
+
+        AddressDto returnValue = new AddressDto();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        AddressEntity addressEntity = modelMapper.map(addressDto, AddressEntity.class);
+
+        String addressId = utils.generateId(30);
+
+        if(addressRepository.findByAddressId(addressId) != null){
+
+            throw new UserServiceException("Duplicated Address ID occured. Please try again.");
+        }
+
+        addressEntity.setAddressId(addressId);
+
+        addressEntity.setUserDetails(userEntity);
+
+        AddressEntity savedAddress = addressRepository.save(addressEntity);
+
+        returnValue = modelMapper.map(savedAddress, AddressDto.class);
 
         return returnValue;
     }

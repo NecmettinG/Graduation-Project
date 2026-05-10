@@ -194,6 +194,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(String userId, UserDto user){
 
         UserEntity userEntity = userRepository.findByUserId(userId);

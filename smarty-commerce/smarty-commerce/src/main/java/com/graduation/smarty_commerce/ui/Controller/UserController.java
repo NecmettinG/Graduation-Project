@@ -5,6 +5,7 @@ import com.graduation.smarty_commerce.Service.impl.AddressServiceImpl;
 import com.graduation.smarty_commerce.Service.impl.UserServiceImpl;
 import com.graduation.smarty_commerce.shared.Roles;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
+import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.UserDetailsRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.*;
 import org.modelmapper.ModelMapper;
@@ -146,6 +147,26 @@ public class UserController {
         else{
 
             returnValue.setOperationResult(RequestOperationStatus.ERROR.name());
+        }
+
+        return returnValue;
+    }
+
+    @PostMapping(path = "/password-reset-request",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel requestReset(@RequestBody PasswordResetRequestModel passwordResetRequestModel){
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+
+        boolean operationResult = userService.requestPasswordReset(passwordResetRequestModel.getEmail());
+
+        returnValue.setOperationName(RequestOperationName.REQUEST_PASSWORD_RESET.name());
+        returnValue.setOperationResult(RequestOperationStatus.ERROR.name());
+
+        if(operationResult){
+
+            returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
         }
 
         return returnValue;

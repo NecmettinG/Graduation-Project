@@ -4,11 +4,13 @@ import com.graduation.smarty_commerce.Exceptions.UserServiceException;
 import com.graduation.smarty_commerce.Security.UserPrincipal;
 import com.graduation.smarty_commerce.Service.UserService;
 import com.graduation.smarty_commerce.io.Entity.AddressEntity;
+import com.graduation.smarty_commerce.io.Entity.PasswordResetTokenEntity;
 import com.graduation.smarty_commerce.io.Entity.RoleEntity;
 import com.graduation.smarty_commerce.io.Entity.UserEntity;
 import com.graduation.smarty_commerce.io.Repository.PasswordResetTokenRepository;
 import com.graduation.smarty_commerce.io.Repository.RoleRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
+import com.graduation.smarty_commerce.shared.AmazonSES;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.AddressDto;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
@@ -45,8 +47,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-//    @Autowired
-//    AmazonSES amazonSES;
+    @Autowired
+    AmazonSES amazonSES;
 
     @Autowired
     RoleRepository roleRepository;
@@ -266,6 +268,36 @@ public class UserServiceImpl implements UserService {
                 returnValue = true;
             }
         }
+
+        return returnValue;
+    }
+
+
+    @Override
+    public boolean requestPasswordReset(String email){
+
+        boolean returnValue = false;
+
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        if(userEntity == null){
+
+            return returnValue;
+        }
+
+        String token = utils.generatePasswordResetToken(userEntity.getUserId());
+
+        PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
+        passwordResetTokenEntity.setToken(token);
+        passwordResetTokenEntity.setUserDetails(userEntity);
+
+        passwordResetTokenRepository.save(passwordResetTokenEntity);
+
+        returnValue = new AmazonSES().sendPasswordResetRequest(
+                userEntity.getFirstName(),
+                userEntity.getEmail(),
+                token
+        );
 
         return returnValue;
     }

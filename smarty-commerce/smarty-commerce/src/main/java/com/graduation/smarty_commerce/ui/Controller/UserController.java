@@ -5,6 +5,7 @@ import com.graduation.smarty_commerce.Service.impl.AddressServiceImpl;
 import com.graduation.smarty_commerce.Service.impl.UserServiceImpl;
 import com.graduation.smarty_commerce.shared.Roles;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
+import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetModel;
 import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.UserDetailsRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.*;
@@ -162,6 +163,29 @@ public class UserController {
         boolean operationResult = userService.requestPasswordReset(passwordResetRequestModel.getEmail());
 
         returnValue.setOperationName(RequestOperationName.REQUEST_PASSWORD_RESET.name());
+        returnValue.setOperationResult(RequestOperationStatus.ERROR.name());
+
+        if(operationResult){
+
+            returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        }
+
+        return returnValue;
+    }
+
+    @PostMapping(path = "/password-reset",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel resetPassword(@RequestBody PasswordResetModel passwordResetModel){
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+
+        boolean operationResult = userService.resetPassword(
+                passwordResetModel.getToken(),
+                passwordResetModel.getPassword()
+        );
+
+        returnValue.setOperationName(RequestOperationName.PASSWORD_RESET.name());
         returnValue.setOperationResult(RequestOperationStatus.ERROR.name());
 
         if(operationResult){

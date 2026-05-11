@@ -1,10 +1,12 @@
 package com.graduation.smarty_commerce.ui.Controller;
 
 import com.graduation.smarty_commerce.Exceptions.UserServiceException;
-import com.graduation.smarty_commerce.Service.impl.AddressServiceImpl;
+import com.graduation.smarty_commerce.Service.AddressService;
 import com.graduation.smarty_commerce.Service.impl.UserServiceImpl;
 import com.graduation.smarty_commerce.shared.Roles;
+import com.graduation.smarty_commerce.shared.dto.AddressDto;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
+import com.graduation.smarty_commerce.ui.Model.Request.AddressRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetModel;
 import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.UserDetailsRequestModel;
@@ -16,7 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.modelmapper.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,8 +33,8 @@ public class UserController {
     @Autowired
     UserServiceImpl userService;
 
-//    @Autowired
-//    AddressServiceImpl addressService;
+    @Autowired
+    AddressService addressService;
 
     @PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userId")
     @GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -192,6 +196,77 @@ public class UserController {
 
             returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
         }
+
+        return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @GetMapping(path = "/{id}/addresses", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<AddressRest> getUserAddresses(@PathVariable("id") String id) {
+
+        List<AddressRest> returnValue = new ArrayList<>();
+
+        List<AddressDto> addressDtos = addressService.getAddresses(id);
+
+        if (addressDtos != null && !addressDtos.isEmpty()) {
+            Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+            returnValue = new ModelMapper().map(addressDtos, listType);
+        }
+
+        return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @GetMapping(path = "/{id}/addresses/{addressId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public AddressRest getUserAddress(@PathVariable("id") String id, @PathVariable("addressId") String addressId) {
+
+        AddressDto addressDto = addressService.getAddress(addressId);
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        return modelMapper.map(addressDto, AddressRest.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @PostMapping(path = "/{id}/addresses",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public AddressRest createAddress(@PathVariable("id") String id, @RequestBody AddressRequestModel addressRequestModel) {
+
+        ModelMapper modelMapper = new ModelMapper();
+        AddressDto addressDto = modelMapper.map(addressRequestModel, AddressDto.class);
+
+        AddressDto createdAddress = addressService.createAddress(id, addressDto);
+
+        return modelMapper.map(createdAddress, AddressRest.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @PutMapping(path = "/{id}/addresses/{addressId}",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public AddressRest updateAddress(@PathVariable("id") String id,
+                                     @PathVariable("addressId") String addressId,
+                                     @RequestBody AddressRequestModel addressRequestModel) {
+
+        ModelMapper modelMapper = new ModelMapper();
+        AddressDto addressDto = modelMapper.map(addressRequestModel, AddressDto.class);
+
+        AddressDto updatedAddress = addressService.updateAddress(addressId, addressDto);
+
+        return modelMapper.map(updatedAddress, AddressRest.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @DeleteMapping(path = "/{id}/addresses/{addressId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel deleteAddress(@PathVariable("id") String id, @PathVariable("addressId") String addressId) {
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+
+        addressService.deleteAddress(addressId);
+
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 
         return returnValue;
     }

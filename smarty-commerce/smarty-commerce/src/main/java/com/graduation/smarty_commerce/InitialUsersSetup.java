@@ -1,9 +1,11 @@
 package com.graduation.smarty_commerce;
 
 import com.graduation.smarty_commerce.io.Entity.AuthorityEntity;
+import com.graduation.smarty_commerce.io.Entity.MainCategoryEntity;
 import com.graduation.smarty_commerce.io.Entity.RoleEntity;
 import com.graduation.smarty_commerce.io.Entity.UserEntity;
 import com.graduation.smarty_commerce.io.Repository.AuthorityRepository;
+import com.graduation.smarty_commerce.io.Repository.MainCategoryRepository;
 import com.graduation.smarty_commerce.io.Repository.RoleRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
 import com.graduation.smarty_commerce.shared.Roles;
@@ -36,6 +38,9 @@ public class InitialUsersSetup {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MainCategoryRepository mainCategoryRepository;
+
     @EventListener
     @Transactional
     public void onApplicationEvent(ApplicationReadyEvent event){
@@ -64,6 +69,22 @@ public class InitialUsersSetup {
             adminUser.setRoles(Arrays.asList(roleAdmin));
 
             userRepository.save(adminUser);
+        }
+
+        initializeMainCategories();
+    }
+
+    @Transactional
+    protected void initializeMainCategories() {
+        String[] categories = {"Electronics", "Clothing(Male)", "Clothing(Female)", "Home and Furniture", "Cosmetic", "Supermarket", "Sports", "Stationary"};
+        for (String categoryName : categories) {
+            MainCategoryEntity category = mainCategoryRepository.findByCategoryName(categoryName);
+            if (category == null) {
+                category = new MainCategoryEntity();
+                category.setCategoryId(utils.generateId(10));
+                category.setCategoryName(categoryName);
+                mainCategoryRepository.save(category);
+            }
         }
     }
 

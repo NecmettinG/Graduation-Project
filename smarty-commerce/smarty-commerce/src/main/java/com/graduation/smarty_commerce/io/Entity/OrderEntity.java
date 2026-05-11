@@ -26,9 +26,6 @@ public class OrderEntity implements Serializable {
     private Date orderDate;
 
     @Column(nullable = false)
-    private String userId;
-
-    @Column(nullable = false)
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
@@ -58,14 +55,6 @@ public class OrderEntity implements Serializable {
 
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public OrderStatus getOrderStatus() {

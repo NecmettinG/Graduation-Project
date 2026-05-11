@@ -1,13 +1,11 @@
 package com.graduation.smarty_commerce;
 
-import com.graduation.smarty_commerce.io.Entity.AuthorityEntity;
-import com.graduation.smarty_commerce.io.Entity.MainCategoryEntity;
-import com.graduation.smarty_commerce.io.Entity.RoleEntity;
-import com.graduation.smarty_commerce.io.Entity.UserEntity;
+import com.graduation.smarty_commerce.io.Entity.*;
 import com.graduation.smarty_commerce.io.Repository.AuthorityRepository;
 import com.graduation.smarty_commerce.io.Repository.MainCategoryRepository;
 import com.graduation.smarty_commerce.io.Repository.RoleRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
+import com.graduation.smarty_commerce.io.Repository.CategoryRepository;
 import com.graduation.smarty_commerce.shared.Roles;
 import com.graduation.smarty_commerce.shared.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +39,9 @@ public class InitialUsersSetup {
     @Autowired
     private MainCategoryRepository mainCategoryRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @EventListener
     @Transactional
     public void onApplicationEvent(ApplicationReadyEvent event){
@@ -72,6 +73,7 @@ public class InitialUsersSetup {
         }
 
         initializeMainCategories();
+        initializeSubCategories();
     }
 
     @Transactional
@@ -84,6 +86,24 @@ public class InitialUsersSetup {
                 category.setCategoryId(utils.generateId(10));
                 category.setCategoryName(categoryName);
                 mainCategoryRepository.save(category);
+            }
+        }
+    }
+
+    @Transactional
+    protected void initializeSubCategories() {
+        MainCategoryEntity electronics = mainCategoryRepository.findByCategoryName("Electronics");
+        if (electronics != null) {
+            String[] subCategories = {"Phones", "Computers", "Wearable Tech", "TV and Sound", "Camera", "Peripheral Devices", "Consoles"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new com.graduation.smarty_commerce.io.Entity.CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(electronics);
+                    categoryRepository.save(category);
+                }
             }
         }
     }

@@ -166,6 +166,36 @@ public class InitialUsersSetup {
                 }
             }
         }
+        
+        MainCategoryEntity supermarket = mainCategoryRepository.findByCategoryName("Supermarket");
+        if (supermarket != null) {
+            String[] subCategories = {"Home and Cleaning", "Beverages", "Snacks"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(supermarket);
+                    categoryRepository.save(category);
+                }
+            }
+        }
+        
+        MainCategoryEntity sports = mainCategoryRepository.findByCategoryName("Sports");
+        if (sports != null) {
+            String[] subCategories = {"Sports Wear", "Ball", "Shoe", "Fitness Equipment", "Sports Gear"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(sports);
+                    categoryRepository.save(category);
+                }
+            }
+        }
     }
 
     @Transactional

@@ -121,6 +121,21 @@ public class InitialUsersSetup {
                 }
             }
         }
+        
+        MainCategoryEntity clothingFemale = mainCategoryRepository.findByCategoryName("Clothing(Female)");
+        if (clothingFemale != null) {
+            String[] subCategories = {"T-Shirt", "Shorts", "Shirt", "Tracksuit", "Trousers", "Jacket", "Dress", "Skirt"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(clothingFemale);
+                    categoryRepository.save(category);
+                }
+            }
+        }
     }
 
     @Transactional

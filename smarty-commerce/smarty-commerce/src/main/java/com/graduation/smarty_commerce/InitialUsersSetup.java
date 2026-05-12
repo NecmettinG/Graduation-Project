@@ -136,6 +136,21 @@ public class InitialUsersSetup {
                 }
             }
         }
+        
+        MainCategoryEntity homeAndFurniture = mainCategoryRepository.findByCategoryName("Home and Furniture");
+        if (homeAndFurniture != null) {
+            String[] subCategories = {"Bedroom", "Living Room", "Sofa", "Kitchen", "Home Decoration", "Home Textile"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(homeAndFurniture);
+                    categoryRepository.save(category);
+                }
+            }
+        }
     }
 
     @Transactional

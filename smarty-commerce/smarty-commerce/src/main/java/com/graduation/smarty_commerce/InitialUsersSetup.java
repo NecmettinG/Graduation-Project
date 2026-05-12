@@ -151,6 +151,21 @@ public class InitialUsersSetup {
                 }
             }
         }
+        
+        MainCategoryEntity cosmetic = mainCategoryRepository.findByCategoryName("Cosmetic");
+        if (cosmetic != null) {
+            String[] subCategories = {"Make-up", "Skin care", "Perfume and Deodorant", "Hair care", "Personal care"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(cosmetic);
+                    categoryRepository.save(category);
+                }
+            }
+        }
     }
 
     @Transactional

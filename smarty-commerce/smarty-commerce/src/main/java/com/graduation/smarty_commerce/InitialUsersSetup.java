@@ -96,7 +96,7 @@ public class InitialUsersSetup {
         if (electronics != null) {
             String[] subCategories = {"Phones", "Computers", "Wearable Tech", "TV and Sound", "Camera", "Peripheral Devices", "Consoles"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, electronics);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
@@ -111,7 +111,7 @@ public class InitialUsersSetup {
         if (clothingMale != null) {
             String[] subCategories = {"T-Shirt", "Shorts", "Shirt", "Tracksuit", "Trousers", "Jacket", "Suit"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, clothingMale);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
@@ -126,7 +126,7 @@ public class InitialUsersSetup {
         if (clothingFemale != null) {
             String[] subCategories = {"T-Shirt", "Shorts", "Shirt", "Tracksuit", "Trousers", "Jacket", "Dress", "Skirt"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, clothingFemale);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
@@ -141,7 +141,7 @@ public class InitialUsersSetup {
         if (homeAndFurniture != null) {
             String[] subCategories = {"Bedroom", "Living Room", "Sofa", "Kitchen", "Home Decoration", "Home Textile"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, homeAndFurniture);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
@@ -156,7 +156,7 @@ public class InitialUsersSetup {
         if (cosmetic != null) {
             String[] subCategories = {"Make-up", "Skin care", "Perfume and Deodorant", "Hair care", "Personal care"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, cosmetic);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
@@ -171,7 +171,7 @@ public class InitialUsersSetup {
         if (supermarket != null) {
             String[] subCategories = {"Home and Cleaning", "Beverages", "Snacks"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, supermarket);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
@@ -186,7 +186,7 @@ public class InitialUsersSetup {
         if (sports != null) {
             String[] subCategories = {"Sports Wear", "Ball", "Shoe", "Fitness Equipment", "Sports Gear"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, sports);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
@@ -201,7 +201,7 @@ public class InitialUsersSetup {
         if (stationary != null) {
             String[] subCategories = {"Musical Instrument", "Gift", "Board Game", "Books", "Office", "Pen and Pencil"};
             for (String subCategoryName : subCategories) {
-                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                CategoryEntity category = categoryRepository.findByCategoryNameAndMainCategory(subCategoryName, stationary);
                 if (category == null) {
                     category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));

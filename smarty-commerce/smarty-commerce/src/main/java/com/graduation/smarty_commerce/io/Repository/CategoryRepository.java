@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
     CategoryEntity findByCategoryName(String categoryName);
+    CategoryEntity findByCategoryNameAndMainCategory(String categoryName, com.graduation.smarty_commerce.io.Entity.MainCategoryEntity mainCategory);
 }

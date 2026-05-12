@@ -196,6 +196,21 @@ public class InitialUsersSetup {
                 }
             }
         }
+        
+        MainCategoryEntity stationary = mainCategoryRepository.findByCategoryName("Stationary");
+        if (stationary != null) {
+            String[] subCategories = {"Musical Instrument", "Gift", "Board Game", "Books", "Office", "Pen and Pencil"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(stationary);
+                    categoryRepository.save(category);
+                }
+            }
+        }
     }
 
     @Transactional

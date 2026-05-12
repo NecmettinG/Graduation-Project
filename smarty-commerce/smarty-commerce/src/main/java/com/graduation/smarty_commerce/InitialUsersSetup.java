@@ -98,10 +98,25 @@ public class InitialUsersSetup {
             for (String subCategoryName : subCategories) {
                 CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
                 if (category == null) {
-                    category = new com.graduation.smarty_commerce.io.Entity.CategoryEntity();
+                    category = new CategoryEntity();
                     category.setCategoryId(utils.generateId(10));
                     category.setCategoryName(subCategoryName);
                     category.setMainCategory(electronics);
+                    categoryRepository.save(category);
+                }
+            }
+        }
+
+        MainCategoryEntity clothingMale = mainCategoryRepository.findByCategoryName("Clothing(Male)");
+        if (clothingMale != null) {
+            String[] subCategories = {"T-Shirt", "Shorts", "Shirt", "Tracksuit", "Trousers", "Jacket", "Suit"};
+            for (String subCategoryName : subCategories) {
+                CategoryEntity category = categoryRepository.findByCategoryName(subCategoryName);
+                if (category == null) {
+                    category = new CategoryEntity();
+                    category.setCategoryId(utils.generateId(10));
+                    category.setCategoryName(subCategoryName);
+                    category.setMainCategory(clothingMale);
                     categoryRepository.save(category);
                 }
             }

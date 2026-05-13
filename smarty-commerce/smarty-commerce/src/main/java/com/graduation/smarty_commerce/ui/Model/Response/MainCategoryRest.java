@@ -1,10 +1,13 @@
 package com.graduation.smarty_commerce.ui.Model.Response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 public class MainCategoryRest {
     private String categoryId;
     private String categoryName;
+
+    @JsonIgnoreProperties("mainCategory")
     private List<CategoryRest> subCategories;
 
     public String getCategoryId() {
@@ -31,4 +34,3 @@ public class MainCategoryRest {
         this.subCategories = subCategories;
     }
 }
-

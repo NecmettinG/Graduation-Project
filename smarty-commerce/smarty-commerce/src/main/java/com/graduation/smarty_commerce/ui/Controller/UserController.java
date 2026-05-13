@@ -2,6 +2,7 @@ package com.graduation.smarty_commerce.ui.Controller;
 
 import com.graduation.smarty_commerce.Exceptions.UserServiceException;
 import com.graduation.smarty_commerce.Service.AddressService;
+import com.graduation.smarty_commerce.Service.impl.AddressServiceImpl;
 import com.graduation.smarty_commerce.Service.impl.UserServiceImpl;
 import com.graduation.smarty_commerce.shared.Roles;
 import com.graduation.smarty_commerce.shared.dto.AddressDto;
@@ -34,7 +35,7 @@ public class UserController {
     UserServiceImpl userService;
 
     @Autowired
-    AddressService addressService;
+    AddressServiceImpl addressService;
 
     @PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userId")
     @GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})

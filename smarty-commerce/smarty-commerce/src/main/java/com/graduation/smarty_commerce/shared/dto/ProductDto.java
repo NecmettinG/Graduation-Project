@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class ProductDto implements Serializable {
 
@@ -34,6 +35,8 @@ public class ProductDto implements Serializable {
     private List<OrderItemDto> orderItems;
 
     private List<CartItemDto> cartItems;
+
+    private Map<String, Object> attributes;
 
 
     public long getId() {
@@ -115,5 +118,12 @@ public class ProductDto implements Serializable {
     public void setProductId(String productId) {
         this.productId = productId;
     }
-}
 
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+}

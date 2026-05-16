@@ -4,6 +4,7 @@ import com.graduation.smarty_commerce.shared.dto.CategoryDto;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class ProductRequestModel {
 
@@ -18,6 +19,8 @@ public class ProductRequestModel {
     private String description;
 
     private String categoryId;
+
+    private Map<String, Object> attributes;
 
     public String getProductName() {
         return productName;
@@ -65,5 +68,13 @@ public class ProductRequestModel {
 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
     }
 }

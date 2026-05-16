@@ -1,11 +1,13 @@
 package com.graduation.smarty_commerce.io.Entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "products")
@@ -43,6 +45,10 @@ public class ProductEntity implements Serializable {
     //Cascade type all and orphan removal can be deleted!
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true)
     private List<CartItemEntity> cartItems;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> attributes;
 
     public long getId() {
         return id;
@@ -122,5 +128,13 @@ public class ProductEntity implements Serializable {
 
     public void setProductId(String productId) {
         this.productId = productId;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
     }
 }

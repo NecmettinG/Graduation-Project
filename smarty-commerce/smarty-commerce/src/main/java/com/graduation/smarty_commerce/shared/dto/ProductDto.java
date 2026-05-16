@@ -26,7 +26,7 @@ public class ProductDto implements Serializable {
 
     private int stock;
 
-    private String imageUrl;
+    private List<String> imageUrls;
 
     private String description;
 
@@ -71,12 +71,12 @@ public class ProductDto implements Serializable {
         this.stock = stock;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public String getDescription() {

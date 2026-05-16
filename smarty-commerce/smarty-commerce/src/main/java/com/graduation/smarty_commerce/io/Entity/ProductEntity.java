@@ -30,7 +30,9 @@ public class ProductEntity implements Serializable {
 
     private int stock;
 
-    private String imageUrl;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<String> imageUrls;
 
     private String description;
 
@@ -82,12 +84,12 @@ public class ProductEntity implements Serializable {
         this.stock = stock;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public String getDescription() {

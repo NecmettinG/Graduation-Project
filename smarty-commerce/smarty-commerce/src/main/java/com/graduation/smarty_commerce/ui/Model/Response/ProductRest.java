@@ -1,6 +1,7 @@
 package com.graduation.smarty_commerce.ui.Model.Response;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 public class ProductRest {
@@ -8,7 +9,7 @@ public class ProductRest {
     private String productName;
     private BigDecimal price;
     private int stock;
-    private String imageUrl;
+    private List<String> imageUrls;
     private String description;
     private CategoryRest category;
     private Map<String, Object> attributes;
@@ -45,12 +46,12 @@ public class ProductRest {
         this.stock = stock;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public String getDescription() {

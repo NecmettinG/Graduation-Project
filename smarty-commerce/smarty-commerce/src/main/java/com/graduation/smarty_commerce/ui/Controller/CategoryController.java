@@ -10,6 +10,7 @@ import com.graduation.smarty_commerce.ui.Model.Response.OperationStatusModel;
 import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationName;
 import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationStatus;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
+
+    /*
+     modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT):
+     By default, ModelMapper tries to map fields intelligently by looking at tokenized property names. Because CategoryRequestModel contains
+     mainCategoryId, ModelMapper sees the prefix mainCategory and expects that it should map it to the interior structure of
+     MainCategoryDto mainCategory inside CategoryDto. However, the nested mappings become inconsistent and ambiguous.
+     Switching the configuration to STRICT forces ModelMapper to demand a perfect token match.
+     It will skip mainCategoryId entirely (because CategoryDto doesn't have that primitive field), allowing the explicit instantiation
+     and mapping of MainCategoryDto found immediately after in the controller to work without crashing.*/
 
     @Autowired
     private CategoryServiceImpl categoryService;
@@ -35,6 +45,7 @@ public class CategoryController {
     @PostMapping
     public CategoryRest createCategory(@RequestBody CategoryRequestModel categoryDetails) {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CategoryDto categoryDto = modelMapper.map(categoryDetails, CategoryDto.class);
         
         if(categoryDetails.getMainCategoryId() != null) {
@@ -51,6 +62,7 @@ public class CategoryController {
     @PutMapping(path = "/{id}")
     public CategoryRest updateCategory(@PathVariable String id, @RequestBody CategoryRequestModel categoryDetails) {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CategoryDto categoryDto = modelMapper.map(categoryDetails, CategoryDto.class);
         
         if(categoryDetails.getMainCategoryId() != null) {
@@ -76,8 +88,8 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<CategoryRest> getCategories(@RequestParam(value = "page", defaultValue = "0") int page,
-                                            @RequestParam(value = "limit", defaultValue = "25") int limit) {
+    public List<CategoryRest> getCategories(@RequestParam(value = "page", defaultValue = "1") int page,
+                                            @RequestParam(value = "limit", defaultValue = "20") int limit) {
         List<CategoryRest> returnValue = new ArrayList<>();
 
         List<CategoryDto> categories = categoryService.getCategories(page, limit);

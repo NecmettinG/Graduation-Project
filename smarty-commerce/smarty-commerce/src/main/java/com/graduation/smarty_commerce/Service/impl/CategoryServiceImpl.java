@@ -8,6 +8,7 @@ import com.graduation.smarty_commerce.io.Repository.CategoryRepository;
 import com.graduation.smarty_commerce.io.Repository.MainCategoryRepository;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.CategoryDto;
+import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -70,6 +71,11 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryDto> returnValue = new ArrayList<>();
 
         if (page > 0) page = page - 1;
+
+        else{
+
+            throw new CategoryServiceException(ErrorMessages.INVALID_PAGE_NUMBER.getErrorMessage());
+        }
 
         Pageable pageableRequest = PageRequest.of(page, limit);
         Page<CategoryEntity> categoriesPage = categoryRepository.findAll(pageableRequest);

@@ -2,6 +2,9 @@ package com.graduation.smarty_commerce.io.Repository;
 import com.graduation.smarty_commerce.io.Entity.CartEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 @Repository
 public interface CartRepository extends JpaRepository<CartEntity, Long> {
+    CartEntity findByUserUserId(String userId);
+    CartEntity findByCartId(String cartId);
 }

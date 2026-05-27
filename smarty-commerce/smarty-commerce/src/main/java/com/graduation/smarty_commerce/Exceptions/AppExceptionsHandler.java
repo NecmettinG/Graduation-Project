@@ -32,6 +32,13 @@ public class AppExceptionsHandler {
         return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(value = {CartServiceException.class})
+    public ResponseEntity<Object> handleCartServiceException(CartServiceException ex, WebRequest request)
+    {
+        ErrorMessage errorMessage = new ErrorMessage(new Date(), ex.getMessage());
+        return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
 
     @ExceptionHandler(value = {Exception.class})

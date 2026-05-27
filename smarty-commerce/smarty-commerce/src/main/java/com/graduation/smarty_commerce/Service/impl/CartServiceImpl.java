@@ -1,6 +1,6 @@
 package com.graduation.smarty_commerce.Service.impl;
 
-import com.graduation.smarty_commerce.Exceptions.UserServiceException;
+import com.graduation.smarty_commerce.Exceptions.CartServiceException;
 import com.graduation.smarty_commerce.Service.CartService;
 import com.graduation.smarty_commerce.io.Entity.CartEntity;
 import com.graduation.smarty_commerce.io.Entity.CartItemEntity;
@@ -51,7 +51,7 @@ public class CartServiceImpl implements CartService {
         CartEntity cartEntity = getOrCreateCart(userId);
         
         ProductEntity productEntity = productRepository.findByProductId(cartItemDetails.getProductId());
-        if (productEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        if (productEntity == null) throw new CartServiceException(ErrorMessages.PRODUCT_NOT_FOUND.getErrorMessage());
 
         CartItemEntity cartItemEntity = null;
         if (cartEntity.getCartItems() == null) {
@@ -93,7 +93,7 @@ public class CartServiceImpl implements CartService {
             }
         }
         
-        if (cartItemEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        if (cartItemEntity == null) throw new CartServiceException(ErrorMessages.CART_ITEM_NOT_FOUND.getErrorMessage());
         
         cartItemEntity.setQuantity(cartItemDetails.getQuantity());
         recalculateTotal(cartEntity);
@@ -114,7 +114,7 @@ public class CartServiceImpl implements CartService {
             }
         }
         
-        if (itemToRemove == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        if (itemToRemove == null) throw new CartServiceException(ErrorMessages.CART_ITEM_NOT_FOUND.getErrorMessage());
         
         cartEntity.getCartItems().remove(itemToRemove);
         cartItemRepository.delete(itemToRemove);
@@ -136,7 +136,7 @@ public class CartServiceImpl implements CartService {
 
     private CartEntity getOrCreateCart(String userId) {
         UserEntity userEntity = userRepository.findByUserId(userId);
-        if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        if (userEntity == null) throw new CartServiceException(ErrorMessages.USER_NOT_FOUND.getErrorMessage());
 
         CartEntity cartEntity = cartRepository.findByUserUserId(userId);
         if (cartEntity == null) {

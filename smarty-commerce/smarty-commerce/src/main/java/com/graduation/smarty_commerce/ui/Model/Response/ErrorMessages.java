@@ -10,7 +10,13 @@ public enum ErrorMessages {
     COULD_NOT_UPDATE_RECORD("Could not update record"),
     COULD_NOT_DELETE_RECORD("Could not delete record"),
     EMAIL_ADDRESS_NOT_VERIFIED("Email address could not be verified"),
-    INVALID_PAGE_NUMBER("Page number cannot be less than 0.");
+    INVALID_PAGE_NUMBER("Page number cannot be less than 0."),
+    USER_NOT_FOUND("User not found!"),
+    CART_IS_EMPTY("Cart is empty!"),
+    NOT_ENOUGH_STOCK("Not enough stock for product"),
+    ORDER_NOT_FOUND("Order not found!"),
+    UNAUTHORIZED_ORDER_ACTION("Order does not belong to this user!"),
+    ORDER_CANCELLATION_NOT_ALLOWED("Only PENDING orders can be cancelled!");
 
 
     private String errorMessage;

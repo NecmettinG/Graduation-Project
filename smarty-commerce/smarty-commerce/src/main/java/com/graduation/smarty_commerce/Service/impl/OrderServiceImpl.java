@@ -8,6 +8,7 @@ import com.graduation.smarty_commerce.shared.OrderStatus;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.OrderDto;
 import com.graduation.smarty_commerce.ui.Model.Request.OrderRequestModel;
+import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto createOrder(String userId, OrderRequestModel orderDetails) {
         UserEntity userEntity = userRepository.findByUserId(userId);
-        if (userEntity == null) throw new OrderServiceException("User not found!");
+        if (userEntity == null) throw new OrderServiceException(ErrorMessages.USER_NOT_FOUND.getErrorMessage());
 
         CartEntity cartEntity = userEntity.getCart();
         if (cartEntity == null || cartEntity.getCartItems() == null || cartEntity.getCartItems().isEmpty()) {
-            throw new OrderServiceException("Cart is empty!");
+            throw new OrderServiceException(ErrorMessages.CART_IS_EMPTY.getErrorMessage());
         }
 
         OrderEntity orderEntity = new OrderEntity();
@@ -60,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
         for (CartItemEntity cartItem : cartEntity.getCartItems()) {
             ProductEntity product = cartItem.getProduct();
             if (product.getStock() < cartItem.getQuantity()) {
-                throw new OrderServiceException("Not enough stock for product: " + product.getProductName());
+                throw new OrderServiceException(ErrorMessages.NOT_ENOUGH_STOCK.getErrorMessage() + ": " + product.getProductName());
             }
 
             // Deduct stock
@@ -99,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto getOrder(String orderId) {
         OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
-        if (orderEntity == null) throw new OrderServiceException("Order not found!");
+        if (orderEntity == null) throw new OrderServiceException(ErrorMessages.ORDER_NOT_FOUND.getErrorMessage());
 
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(orderEntity, OrderDto.class);
@@ -117,14 +118,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto cancelOrder(String userId, String orderId) {
         OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
-        if (orderEntity == null) throw new OrderServiceException("Order not found!");
+        if (orderEntity == null) throw new OrderServiceException(ErrorMessages.ORDER_NOT_FOUND.getErrorMessage());
 
         if (!orderEntity.getUser().getUserId().equals(userId)) {
-            throw new OrderServiceException("Order does not belong to this user!");
+            throw new OrderServiceException(ErrorMessages.UNAUTHORIZED_ORDER_ACTION.getErrorMessage());
         }
 
         if (orderEntity.getOrderStatus() != OrderStatus.PENDING) {
-            throw new OrderServiceException("Only PENDING orders can be cancelled!");
+            throw new OrderServiceException(ErrorMessages.ORDER_CANCELLATION_NOT_ALLOWED.getErrorMessage());
         }
 
         orderEntity.setOrderStatus(OrderStatus.CANCELLED);

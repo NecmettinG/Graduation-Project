@@ -5,6 +5,9 @@ import com.graduation.smarty_commerce.Service.impl.OrderServiceImpl;
 import com.graduation.smarty_commerce.shared.dto.OrderDto;
 import com.graduation.smarty_commerce.ui.Model.Request.OrderRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.OrderRest;
+import com.graduation.smarty_commerce.ui.Model.Response.OperationStatusModel;
+import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationName;
+import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationStatus;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +64,17 @@ public class OrderController {
 
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(cancelledOrder, OrderRest.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping(path = "/{orderId}")
+    public OperationStatusModel deleteOrder(@PathVariable String userId, @PathVariable String orderId) {
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+
+        orderService.deleteOrder(orderId);
+
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        return returnValue;
     }
 }

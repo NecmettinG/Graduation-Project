@@ -142,4 +142,12 @@ public class OrderServiceImpl implements OrderService {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(updatedOrder, OrderDto.class);
     }
+
+    @Override
+    public void deleteOrder(String orderId) {
+        OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
+        if (orderEntity == null) throw new OrderServiceException(ErrorMessages.ORDER_NOT_FOUND.getErrorMessage());
+
+        orderRepository.delete(orderEntity);
+    }
 }

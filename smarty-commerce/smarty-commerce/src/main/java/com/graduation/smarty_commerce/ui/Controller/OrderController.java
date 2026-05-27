@@ -53,5 +53,13 @@ public class OrderController {
         Type listType = new TypeToken<List<OrderRest>>() {}.getType();
         return modelMapper.map(orders, listType);
     }
-}
 
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
+    @PutMapping(path = "/{orderId}/cancel")
+    public OrderRest cancelOrder(@PathVariable String userId, @PathVariable String orderId) {
+        OrderDto cancelledOrder = orderService.cancelOrder(userId, orderId);
+
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(cancelledOrder, OrderRest.class);
+    }
+}

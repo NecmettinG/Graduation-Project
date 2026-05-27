@@ -9,5 +9,5 @@ public interface OrderService {
     OrderDto createOrder(String userId, OrderRequestModel orderDetails);
     OrderDto getOrder(String orderId);
     List<OrderDto> getOrders(String userId);
+    OrderDto cancelOrder(String userId, String orderId);
 }
-

@@ -1,6 +1,7 @@
 package com.graduation.smarty_commerce.Service.impl;
 
 import com.graduation.smarty_commerce.Service.OrderService;
+import com.graduation.smarty_commerce.Exceptions.OrderServiceException;
 import com.graduation.smarty_commerce.io.Entity.*;
 import com.graduation.smarty_commerce.io.Repository.*;
 import com.graduation.smarty_commerce.shared.OrderStatus;
@@ -39,11 +40,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto createOrder(String userId, OrderRequestModel orderDetails) {
         UserEntity userEntity = userRepository.findByUserId(userId);
-        if (userEntity == null) throw new RuntimeException("User not found!");
+        if (userEntity == null) throw new OrderServiceException("User not found!");
 
         CartEntity cartEntity = userEntity.getCart();
         if (cartEntity == null || cartEntity.getCartItems() == null || cartEntity.getCartItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty!");
+            throw new OrderServiceException("Cart is empty!");
         }
 
         OrderEntity orderEntity = new OrderEntity();
@@ -59,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
         for (CartItemEntity cartItem : cartEntity.getCartItems()) {
             ProductEntity product = cartItem.getProduct();
             if (product.getStock() < cartItem.getQuantity()) {
-                throw new RuntimeException("Not enough stock for product: " + product.getProductName());
+                throw new OrderServiceException("Not enough stock for product: " + product.getProductName());
             }
 
             // Deduct stock
@@ -98,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto getOrder(String orderId) {
         OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
-        if (orderEntity == null) throw new RuntimeException("Order not found!");
+        if (orderEntity == null) throw new OrderServiceException("Order not found!");
 
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(orderEntity, OrderDto.class);
@@ -112,5 +113,32 @@ public class OrderServiceImpl implements OrderService {
         Type listType = new TypeToken<List<OrderDto>>() {}.getType();
         return modelMapper.map(orderEntities, listType);
     }
-}
 
+    @Override
+    public OrderDto cancelOrder(String userId, String orderId) {
+        OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
+        if (orderEntity == null) throw new OrderServiceException("Order not found!");
+
+        if (!orderEntity.getUser().getUserId().equals(userId)) {
+            throw new OrderServiceException("Order does not belong to this user!");
+        }
+
+        if (orderEntity.getOrderStatus() != OrderStatus.PENDING) {
+            throw new OrderServiceException("Only PENDING orders can be cancelled!");
+        }
+
+        orderEntity.setOrderStatus(OrderStatus.CANCELLED);
+
+        // Restore stock
+        for (OrderItemEntity orderItem : orderEntity.getOrderItems()) {
+            ProductEntity product = orderItem.getProduct();
+            product.setStock(product.getStock() + orderItem.getQuantity());
+            productRepository.save(product);
+        }
+
+        OrderEntity updatedOrder = orderRepository.save(orderEntity);
+
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(updatedOrder, OrderDto.class);
+    }
+}

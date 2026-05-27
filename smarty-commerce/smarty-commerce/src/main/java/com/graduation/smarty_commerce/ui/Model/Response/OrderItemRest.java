@@ -6,7 +6,7 @@ public class OrderItemRest {
     private String orderItemId;
     private ProductRest product;
     private int quantity;
-    private BigDecimal price;
+    private BigDecimal unitPrice;
 
     public String getOrderItemId() {
         return orderItemId;
@@ -32,11 +32,11 @@ public class OrderItemRest {
         this.quantity = quantity;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

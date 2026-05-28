@@ -159,6 +159,17 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
         if (orderEntity == null) throw new OrderServiceException(ErrorMessages.ORDER_NOT_FOUND.getErrorMessage());
 
+        if (orderEntity.getOrderStatus() != OrderStatus.PENDING) {
+            throw new OrderServiceException(ErrorMessages.ORDER_CANCELLATION_NOT_ALLOWED.getErrorMessage()); // Reusing the message makes sense or could be a specific delete message
+        }
+
+        // Restore stock since it's being deleted completely
+        for (OrderItemEntity orderItem : orderEntity.getOrderItems()) {
+            ProductEntity product = orderItem.getProduct();
+            product.setStock(product.getStock() + orderItem.getQuantity());
+            productRepository.save(product);
+        }
+
         orderRepository.delete(orderEntity);
     }
 }

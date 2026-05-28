@@ -2,14 +2,14 @@ package com.graduation.smarty_commerce.ui.Model.Request;
 
 public class OrderRequestModel {
 
-    private String shippingAddress;
+    private String addressId;
 
-    public String getShippingAddress() {
-        return shippingAddress;
+    public String getAddressId() {
+        return addressId;
     }
 
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
+    public void setAddressId(String addressId) {
+        this.addressId = addressId;
     }
 }
 

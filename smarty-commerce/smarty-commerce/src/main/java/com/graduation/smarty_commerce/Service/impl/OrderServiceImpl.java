@@ -36,6 +36,9 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
 
     @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
     private Utils utils;
 
     @Override
@@ -48,12 +51,20 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderServiceException(ErrorMessages.CART_IS_EMPTY.getErrorMessage());
         }
 
+        AddressEntity addressEntity = addressRepository.findByAddressId(orderDetails.getAddressId());
+        if (addressEntity == null || !addressEntity.getUserDetails().getUserId().equals(userId)) {
+            throw new OrderServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": Address");
+        }
+
+        String formattedAddress = addressEntity.getStreetName() + ", " + addressEntity.getCity() + ", " 
+                + addressEntity.getPostalCode() + ", " + addressEntity.getCountry();
+
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setOrderId(utils.generateId(30));
         orderEntity.setUser(userEntity);
         orderEntity.setOrderDate(new Date());
         orderEntity.setOrderStatus(OrderStatus.PENDING);
-        orderEntity.setShippingAddress(orderDetails.getShippingAddress());
+        orderEntity.setShippingAddress(formattedAddress);
 
         List<OrderItemEntity> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;

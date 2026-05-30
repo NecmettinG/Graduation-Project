@@ -10,6 +10,7 @@ import com.graduation.smarty_commerce.shared.dto.AddressDto;
 import com.graduation.smarty_commerce.shared.dto.CommentDto;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
 import com.graduation.smarty_commerce.ui.Model.Request.AddressRequestModel;
+import com.graduation.smarty_commerce.ui.Model.Request.CommentRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetModel;
 import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.UserDetailsRequestModel;
@@ -285,5 +286,31 @@ public class UserController {
 
         Type listType = new TypeToken<List<CommentRest>>() {}.getType();
         return new ModelMapper().map(comments, listType);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @PutMapping(path = "/{id}/comments/{commentId}",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public CommentRest updateComment(@PathVariable("id") String id,
+                                     @PathVariable("commentId") String commentId,
+                                     @RequestBody CommentRequestModel commentDetails) {
+
+        CommentDto updateComment = commentService.updateComment(commentId, id, commentDetails);
+        return new ModelMapper().map(updateComment, CommentRest.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @DeleteMapping(path = "/{id}/comments/{commentId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel deleteComment(@PathVariable("id") String id, @PathVariable("commentId") String commentId) {
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+
+        commentService.deleteComment(commentId, id);
+
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+
+        return returnValue;
     }
 }

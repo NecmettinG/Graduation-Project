@@ -4,9 +4,13 @@ import com.graduation.smarty_commerce.Service.CommentService;
 import com.graduation.smarty_commerce.io.Entity.CommentEntity;
 import com.graduation.smarty_commerce.io.Entity.ProductEntity;
 import com.graduation.smarty_commerce.io.Entity.UserEntity;
+import com.graduation.smarty_commerce.io.Entity.OrderEntity;
+import com.graduation.smarty_commerce.io.Entity.OrderItemEntity;
 import com.graduation.smarty_commerce.io.Repository.CommentRepository;
+import com.graduation.smarty_commerce.io.Repository.OrderRepository;
 import com.graduation.smarty_commerce.io.Repository.ProductRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
+import com.graduation.smarty_commerce.shared.OrderStatus;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.CommentDto;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
@@ -32,6 +36,9 @@ public class CommentServiceImpl implements CommentService {
     private UserRepository userRepository;
 
     @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
     private Utils utils;
 
     @Override
@@ -41,6 +48,28 @@ public class CommentServiceImpl implements CommentService {
 
         UserEntity userEntity = userRepository.findByUserId(userId);
         if (userEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": User");
+
+        boolean hasPurchased = false;
+        List<OrderEntity> userOrders = orderRepository.findByUserUserId(userId);
+        if (userOrders != null) {
+            for (OrderEntity order : userOrders) {
+                if (order.getOrderStatus() == OrderStatus.DELIVERED) {
+                    if (order.getOrderItems() != null) {
+                        for (OrderItemEntity item : order.getOrderItems()) {
+                            if (item.getProduct().getProductId().equals(productId)) {
+                                hasPurchased = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (hasPurchased) break;
+            }
+        }
+
+        if (!hasPurchased) {
+            throw new RuntimeException("You can only comment on products you have purchased and received.");
+        }
 
         CommentEntity commentEntity = new CommentEntity();
         commentEntity.setCommentId(utils.generateId(30));

@@ -43,6 +43,7 @@ public class OrderServiceImpl implements OrderService {
     private Utils utils;
 
     @Scheduled(fixedRate = 60000) // Runs every minute
+    //All operations execute inside an automatic @Transactional boundary, which protects concurrent writes.
     @Transactional
     public void simulateOrderStateTransitions() {
         long currentTime = System.currentTimeMillis();

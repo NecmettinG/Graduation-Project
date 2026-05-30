@@ -3,9 +3,11 @@ package com.graduation.smarty_commerce.ui.Controller;
 import com.graduation.smarty_commerce.Exceptions.UserServiceException;
 import com.graduation.smarty_commerce.Service.AddressService;
 import com.graduation.smarty_commerce.Service.impl.AddressServiceImpl;
+import com.graduation.smarty_commerce.Service.impl.CommentServiceImpl;
 import com.graduation.smarty_commerce.Service.impl.UserServiceImpl;
 import com.graduation.smarty_commerce.shared.Roles;
 import com.graduation.smarty_commerce.shared.dto.AddressDto;
+import com.graduation.smarty_commerce.shared.dto.CommentDto;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
 import com.graduation.smarty_commerce.ui.Model.Request.AddressRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetModel;
@@ -36,6 +38,9 @@ public class UserController {
 
     @Autowired
     AddressServiceImpl addressService;
+
+    @Autowired
+    CommentServiceImpl commentService;
 
     @PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userId")
     @GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -270,5 +275,15 @@ public class UserController {
         returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 
         return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @GetMapping(path = "/{id}/comments", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<CommentRest> getUserComments(@PathVariable("id") String id) {
+
+        List<CommentDto> comments = commentService.getUserComments(id);
+
+        Type listType = new TypeToken<List<CommentRest>>() {}.getType();
+        return new ModelMapper().map(comments, listType);
     }
 }

@@ -34,17 +34,6 @@ public class CommentController {
         return new ModelMapper().map(comments, listType);
     }
 
-    @GetMapping("/users/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
-    public List<CommentRest> getUserComments(@PathVariable String productId, @PathVariable String userId) {
-        // Technically productId is in the path, but the business logic asks for all user comments
-        // We will just fetch them by userId. You can also map this entirely outside the /products path if you prefer.
-        List<CommentDto> comments = commentService.getUserComments(userId);
-
-        Type listType = new TypeToken<List<CommentRest>>() {}.getType();
-        return new ModelMapper().map(comments, listType);
-    }
-
     @PostMapping("/users/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
     public ResponseEntity<CommentRest> createComment(@PathVariable String productId,

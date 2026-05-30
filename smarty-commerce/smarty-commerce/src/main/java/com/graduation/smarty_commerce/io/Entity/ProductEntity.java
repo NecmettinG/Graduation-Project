@@ -48,6 +48,9 @@ public class ProductEntity implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true)
     private List<CartItemEntity> cartItems;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentEntity> comments;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> attributes;
@@ -130,6 +133,14 @@ public class ProductEntity implements Serializable {
 
     public void setProductId(String productId) {
         this.productId = productId;
+    }
+
+    public List<CommentEntity> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentEntity> comments) {
+        this.comments = comments;
     }
 
     public Map<String, Object> getAttributes() {

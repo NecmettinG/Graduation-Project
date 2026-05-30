@@ -53,6 +53,9 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "userDetails",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AddressEntity> addresses;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentEntity> comments;
+
     public long getId() {
         return id;
     }
@@ -155,5 +158,13 @@ public class UserEntity implements Serializable {
 
     public void setAddresses(List<AddressEntity> addresses) {
         this.addresses = addresses;
+    }
+
+    public List<CommentEntity> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentEntity> comments) {
+        this.comments = comments;
     }
 }

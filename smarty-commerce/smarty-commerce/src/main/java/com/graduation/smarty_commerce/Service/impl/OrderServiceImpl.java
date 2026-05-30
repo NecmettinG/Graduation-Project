@@ -11,7 +11,9 @@ import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -39,6 +41,30 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private Utils utils;
+
+    @Scheduled(fixedRate = 60000) // Runs every minute
+    @Transactional
+    public void simulateOrderStateTransitions() {
+        long currentTime = System.currentTimeMillis();
+
+        // Simulate PENDING -> SHIPPED after 1 minute (60,000 ms)
+        List<OrderEntity> pendingOrders = orderRepository.findByOrderStatus(OrderStatus.PENDING);
+        for (OrderEntity order : pendingOrders) {
+            if (currentTime - order.getOrderDate().getTime() > 60000) {
+                order.setOrderStatus(OrderStatus.SHIPPED);
+                orderRepository.save(order);
+            }
+        }
+
+        // Simulate SHIPPED -> DELIVERED after 2 minutes (120,000 ms from order date)
+        List<OrderEntity> shippedOrders = orderRepository.findByOrderStatus(OrderStatus.SHIPPED);
+        for (OrderEntity order : shippedOrders) {
+            if (currentTime - order.getOrderDate().getTime() > 120000) {
+                order.setOrderStatus(OrderStatus.DELIVERED);
+                orderRepository.save(order);
+            }
+        }
+    }
 
     @Override
     public OrderDto createOrder(String userId, OrderDto orderDetails) {

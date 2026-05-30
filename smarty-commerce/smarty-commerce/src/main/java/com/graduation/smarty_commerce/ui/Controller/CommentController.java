@@ -1,6 +1,7 @@
 package com.graduation.smarty_commerce.ui.Controller;
 
 import com.graduation.smarty_commerce.Service.CommentService;
+import com.graduation.smarty_commerce.Service.impl.CommentServiceImpl;
 import com.graduation.smarty_commerce.shared.dto.CommentDto;
 import com.graduation.smarty_commerce.ui.Model.Request.CommentRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.CommentRest;
@@ -23,11 +24,22 @@ import java.util.List;
 public class CommentController {
 
     @Autowired
-    private CommentService commentService;
+    private CommentServiceImpl commentService;
 
     @GetMapping
     public List<CommentRest> getProductComments(@PathVariable String productId) {
         List<CommentDto> comments = commentService.getProductComments(productId);
+
+        Type listType = new TypeToken<List<CommentRest>>() {}.getType();
+        return new ModelMapper().map(comments, listType);
+    }
+
+    @GetMapping("/users/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
+    public List<CommentRest> getUserComments(@PathVariable String productId, @PathVariable String userId) {
+        // Technically productId is in the path, but the business logic asks for all user comments
+        // We will just fetch them by userId. You can also map this entirely outside the /products path if you prefer.
+        List<CommentDto> comments = commentService.getUserComments(userId);
 
         Type listType = new TypeToken<List<CommentRest>>() {}.getType();
         return new ModelMapper().map(comments, listType);
@@ -68,4 +80,3 @@ public class CommentController {
         return returnValue;
     }
 }
-

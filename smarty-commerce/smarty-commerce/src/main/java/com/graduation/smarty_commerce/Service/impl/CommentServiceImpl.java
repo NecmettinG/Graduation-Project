@@ -63,6 +63,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public List<CommentDto> getUserComments(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        if (userEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": User");
+        
+        List<CommentEntity> comments = commentRepository.findByUserUserId(userId);
+
+        Type listType = new TypeToken<List<CommentDto>>() {}.getType();
+        return new ModelMapper().map(comments, listType);
+    }
+
+    @Override
     public CommentDto updateComment(String commentId, String userId, CommentRequestModel commentDetails) {
         CommentEntity commentEntity = commentRepository.findByCommentId(commentId);
         if (commentEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": Comment");
@@ -91,4 +102,3 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.delete(commentEntity);
     }
 }
-

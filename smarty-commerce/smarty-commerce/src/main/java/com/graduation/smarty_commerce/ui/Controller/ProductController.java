@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,10 +82,15 @@ public class ProductController {
 
     @GetMapping
     public List<ProductRest> getProducts(@RequestParam(value = "page", defaultValue = "1") int page,
-                                         @RequestParam(value = "limit", defaultValue = "25") int limit) {
+                                         @RequestParam(value = "limit", defaultValue = "25") int limit,
+                                         @RequestParam(value = "search", required = false) String search,
+                                         @RequestParam(value = "minPrice", required = false) BigDecimal minPrice,
+                                         @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
+                                         @RequestParam(value = "categoryId", required = false) String categoryId,
+                                         @RequestParam(value = "sortBy", required = false, defaultValue = "newest") String sortBy) {
         List<ProductRest> returnValue = new ArrayList<>();
 
-        List<ProductDto> products = productService.getProducts(page, limit);
+        List<ProductDto> products = productService.getProducts(page, limit, search, minPrice, maxPrice, categoryId, sortBy);
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 

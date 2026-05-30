@@ -15,8 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.criteria.Predicate;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> getProducts(int page, int limit) {
+    public List<ProductDto> getProducts(int page, int limit, String search, BigDecimal minPrice, BigDecimal maxPrice, String categoryId, String sortBy) {
         List<ProductDto> returnValue = new ArrayList<>();
 
         if (page > 0) page = page - 1;
@@ -78,8 +82,46 @@ public class ProductServiceImpl implements ProductService {
             throw new ProductServiceException(ErrorMessages.INVALID_PAGE_NUMBER.getErrorMessage());
         }
 
-        Pageable pageableRequest = PageRequest.of(page, limit);
-        Page<ProductEntity> productsPage = productRepository.findAll(pageableRequest);
+        Sort sort = Sort.by(Sort.Direction.DESC, "id"); // Default sort (newest)
+        if (sortBy != null) {
+            if (sortBy.equalsIgnoreCase("price_asc")) {
+                sort = Sort.by(Sort.Direction.ASC, "price");
+            } else if (sortBy.equalsIgnoreCase("price_desc")) {
+                sort = Sort.by(Sort.Direction.DESC, "price");
+            } else if (sortBy.equalsIgnoreCase("name_asc")) {
+                sort = Sort.by(Sort.Direction.ASC, "productName");
+            } else if (sortBy.equalsIgnoreCase("name_desc")) {
+                sort = Sort.by(Sort.Direction.DESC, "productName");
+            }
+        }
+
+        Pageable pageableRequest = PageRequest.of(page, limit, sort);
+
+        Specification<ProductEntity> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (search != null && !search.trim().isEmpty()) {
+                String searchPattern = "%" + search.toLowerCase() + "%";
+                Predicate namePredicate = cb.like(cb.lower(root.get("productName")), searchPattern);
+                Predicate descPredicate = cb.like(cb.lower(root.get("description")), searchPattern);
+                predicates.add(cb.or(namePredicate, descPredicate));
+            }
+
+            if (minPrice != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+            }
+            if (maxPrice != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
+
+            if (categoryId != null && !categoryId.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("category").get("categoryId"), categoryId));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<ProductEntity> productsPage = productRepository.findAll(spec, pageableRequest);
         List<ProductEntity> products = productsPage.getContent();
 
         ModelMapper modelMapper = new ModelMapper();

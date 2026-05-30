@@ -1,6 +1,8 @@
 package com.graduation.smarty_commerce.io.Entity;
 
 import com.graduation.smarty_commerce.shared.OrderStatus;
+import com.graduation.smarty_commerce.shared.PaymentMethod;
+import com.graduation.smarty_commerce.shared.PaymentStatus;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -33,6 +35,14 @@ public class OrderEntity implements Serializable {
 
     @Column(nullable = false)
     private String shippingAddress;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
     private List<OrderItemEntity> orderItems;
@@ -79,6 +89,22 @@ public class OrderEntity implements Serializable {
 
     public void setShippingAddress(String shippingAddress) {
         this.shippingAddress = shippingAddress;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public List<OrderItemEntity> getOrderItems() {

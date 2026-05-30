@@ -3,6 +3,8 @@ package com.graduation.smarty_commerce.shared.dto;
 import com.graduation.smarty_commerce.io.Entity.OrderItemEntity;
 import com.graduation.smarty_commerce.io.Entity.UserEntity;
 import com.graduation.smarty_commerce.shared.OrderStatus;
+import com.graduation.smarty_commerce.shared.PaymentMethod;
+import com.graduation.smarty_commerce.shared.PaymentStatus;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -30,6 +32,13 @@ public class OrderDto implements Serializable {
     private String shippingAddress;
 
     private String addressId;
+
+    private PaymentMethod paymentMethod;
+
+    private PaymentStatus paymentStatus;
+
+    // Optional field for dummy card processing token if needed
+    private String paymentToken;
 
     private List<OrderItemDto> orderItems;
 
@@ -87,6 +96,30 @@ public class OrderDto implements Serializable {
 
     public void setAddressId(String addressId) {
         this.addressId = addressId;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getPaymentToken() {
+        return paymentToken;
+    }
+
+    public void setPaymentToken(String paymentToken) {
+        this.paymentToken = paymentToken;
     }
 
     public List<OrderItemDto> getOrderItems() {

@@ -5,6 +5,8 @@ import com.graduation.smarty_commerce.Exceptions.OrderServiceException;
 import com.graduation.smarty_commerce.io.Entity.*;
 import com.graduation.smarty_commerce.io.Repository.*;
 import com.graduation.smarty_commerce.shared.OrderStatus;
+import com.graduation.smarty_commerce.shared.PaymentMethod;
+import com.graduation.smarty_commerce.shared.PaymentStatus;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.OrderDto;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
@@ -92,6 +94,26 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setOrderDate(new Date());
         orderEntity.setOrderStatus(OrderStatus.PENDING);
         orderEntity.setShippingAddress(formattedAddress);
+
+        // Map Payment Info
+        if (orderDetails.getPaymentMethod() == null) {
+            throw new OrderServiceException("Payment method is required.");
+        }
+        orderEntity.setPaymentMethod(orderDetails.getPaymentMethod());
+
+        // Dummy Payment Gateway Logic
+        if (orderDetails.getPaymentMethod() == PaymentMethod.CREDIT_CARD || orderDetails.getPaymentMethod() == PaymentMethod.PAYPAL) {
+            if (orderDetails.getPaymentToken() == null || orderDetails.getPaymentToken().isEmpty()) {
+                throw new OrderServiceException("Payment token is required for digital payments.");
+            }
+            // In a real scenario, you'd integrate Stripe/PayPal here.
+            // Simulate successful charge
+            orderEntity.setPaymentStatus(PaymentStatus.PAID);
+        } else if (orderDetails.getPaymentMethod() == PaymentMethod.UPON_DELIVERY) {
+            orderEntity.setPaymentStatus(PaymentStatus.UNPAID);
+        } else {
+            orderEntity.setPaymentStatus(PaymentStatus.UNPAID);
+        }
 
         List<OrderItemEntity> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;

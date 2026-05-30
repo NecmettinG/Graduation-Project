@@ -1,6 +1,8 @@
 package com.graduation.smarty_commerce.ui.Model.Response;
 
 import com.graduation.smarty_commerce.shared.OrderStatus;
+import com.graduation.smarty_commerce.shared.PaymentMethod;
+import com.graduation.smarty_commerce.shared.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -12,6 +14,8 @@ public class OrderRest {
     private OrderStatus orderStatus;
     private BigDecimal totalAmount;
     private String shippingAddress;
+    private PaymentMethod paymentMethod;
+    private PaymentStatus paymentStatus;
     private UserRest user;
     private List<OrderItemRest> orderItems;
 
@@ -53,6 +57,22 @@ public class OrderRest {
 
     public void setShippingAddress(String shippingAddress) {
         this.shippingAddress = shippingAddress;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public UserRest getUser() {

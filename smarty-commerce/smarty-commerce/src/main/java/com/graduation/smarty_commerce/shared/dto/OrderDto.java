@@ -29,6 +29,8 @@ public class OrderDto implements Serializable {
 
     private String shippingAddress;
 
+    private String addressId;
+
     private List<OrderItemDto> orderItems;
 
     public long getId() {
@@ -77,6 +79,14 @@ public class OrderDto implements Serializable {
 
     public void setShippingAddress(String shippingAddress) {
         this.shippingAddress = shippingAddress;
+    }
+
+    public String getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(String addressId) {
+        this.addressId = addressId;
     }
 
     public List<OrderItemDto> getOrderItems() {

@@ -3,6 +3,9 @@ package com.graduation.smarty_commerce.ui.Controller;
 import com.graduation.smarty_commerce.Service.CartService;
 import com.graduation.smarty_commerce.Service.impl.CartServiceImpl;
 import com.graduation.smarty_commerce.shared.dto.CartDto;
+import com.graduation.smarty_commerce.shared.dto.CartItemDto;
+import com.graduation.smarty_commerce.shared.dto.OrderDto;
+import com.graduation.smarty_commerce.shared.dto.ProductDto;
 import com.graduation.smarty_commerce.ui.Model.Request.CartItemRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.CartRest;
 import com.graduation.smarty_commerce.ui.Model.Response.OperationStatusModel;
@@ -33,18 +36,28 @@ public class CartController {
     @PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
     @PostMapping("/items")
     public CartRest addCartItem(@PathVariable String userId, @RequestBody CartItemRequestModel cartItemDetails) {
-        CartDto cartDto = cartService.addCartItem(userId, cartItemDetails);
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        CartItemDto cartItemDto = modelMapper.map(cartItemDetails, CartItemDto.class);
+
+        if (cartItemDetails.getProductId() != null) {
+            ProductDto productDto = new ProductDto();
+            productDto.setProductId(cartItemDetails.getProductId());
+            cartItemDto.setProduct(productDto);
+        }
+
+        CartDto cartDto = cartService.addCartItem(userId, cartItemDto);
         return modelMapper.map(cartDto, CartRest.class);
     }
 
     @PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
     @PutMapping("/items/{cartItemId}")
     public CartRest updateCartItem(@PathVariable String userId, @PathVariable String cartItemId, @RequestBody CartItemRequestModel cartItemDetails) {
-        CartDto cartDto = cartService.updateCartItem(userId, cartItemId, cartItemDetails);
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        CartItemDto cartItemDto = modelMapper.map(cartItemDetails, CartItemDto.class);
+
+        CartDto cartDto = cartService.updateCartItem(userId, cartItemId, cartItemDto);
         return modelMapper.map(cartDto, CartRest.class);
     }
 

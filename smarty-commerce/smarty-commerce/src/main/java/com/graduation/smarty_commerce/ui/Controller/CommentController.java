@@ -39,8 +39,10 @@ public class CommentController {
     public ResponseEntity<CommentRest> createComment(@PathVariable String productId,
                                                      @PathVariable String userId,
                                                      @RequestBody CommentRequestModel commentDetails) {
-        CommentDto createdComment = commentService.createComment(productId, userId, commentDetails);
-        CommentRest returnValue = new ModelMapper().map(createdComment, CommentRest.class);
+        ModelMapper modelMapper = new ModelMapper();
+        CommentDto commentDto = modelMapper.map(commentDetails, CommentDto.class);
+        CommentDto createdComment = commentService.createComment(productId, userId, commentDto);
+        CommentRest returnValue = modelMapper.map(createdComment, CommentRest.class);
 
         return new ResponseEntity<>(returnValue, HttpStatus.CREATED);
     }
@@ -51,8 +53,10 @@ public class CommentController {
                                      @PathVariable String commentId,
                                      @PathVariable String userId,
                                      @RequestBody CommentRequestModel commentDetails) {
-        CommentDto updateComment = commentService.updateComment(commentId, userId, commentDetails);
-        return new ModelMapper().map(updateComment, CommentRest.class);
+        ModelMapper modelMapper = new ModelMapper();
+        CommentDto commentDto = modelMapper.map(commentDetails, CommentDto.class);
+        CommentDto updateComment = commentService.updateComment(commentId, userId, commentDto);
+        return modelMapper.map(updateComment, CommentRest.class);
     }
 
     @DeleteMapping("/{commentId}/users/{userId}")

@@ -29,9 +29,11 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
     @PostMapping
     public ResponseEntity<OrderRest> createOrder(@PathVariable String userId, @RequestBody OrderRequestModel orderDetails) {
-        OrderDto createdOrder = orderService.createOrder(userId, orderDetails);
-
         ModelMapper modelMapper = new ModelMapper();
+        OrderDto orderDto = modelMapper.map(orderDetails, OrderDto.class);
+
+        OrderDto createdOrder = orderService.createOrder(userId, orderDto);
+
         OrderRest returnValue = modelMapper.map(createdOrder, OrderRest.class);
 
         return new ResponseEntity<>(returnValue, HttpStatus.CREATED);

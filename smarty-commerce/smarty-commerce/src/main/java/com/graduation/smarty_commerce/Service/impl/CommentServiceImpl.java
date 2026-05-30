@@ -9,7 +9,6 @@ import com.graduation.smarty_commerce.io.Repository.ProductRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.CommentDto;
-import com.graduation.smarty_commerce.ui.Model.Request.CommentRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -36,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
     private Utils utils;
 
     @Override
-    public CommentDto createComment(String productId, String userId, CommentRequestModel commentDetails) {
+    public CommentDto createComment(String productId, String userId, CommentDto commentDetails) {
         ProductEntity productEntity = productRepository.findByProductId(productId);
         if (productEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": Product");
 
@@ -74,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto updateComment(String commentId, String userId, CommentRequestModel commentDetails) {
+    public CommentDto updateComment(String commentId, String userId, CommentDto commentDetails) {
         CommentEntity commentEntity = commentRepository.findByCommentId(commentId);
         if (commentEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": Comment");
 

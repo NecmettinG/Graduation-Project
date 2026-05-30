@@ -12,6 +12,7 @@ import com.graduation.smarty_commerce.io.Repository.ProductRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.CartDto;
+import com.graduation.smarty_commerce.shared.dto.CartItemDto;
 import com.graduation.smarty_commerce.ui.Model.Request.CartItemRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
@@ -47,10 +48,11 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDto addCartItem(String userId, CartItemRequestModel cartItemDetails) {
+    public CartDto addCartItem(String userId, CartItemDto cartItemDetails) {
         CartEntity cartEntity = getOrCreateCart(userId);
         
-        ProductEntity productEntity = productRepository.findByProductId(cartItemDetails.getProductId());
+        String productId = cartItemDetails.getProduct() != null ? cartItemDetails.getProduct().getProductId() : null;
+        ProductEntity productEntity = productRepository.findByProductId(productId);
         if (productEntity == null) throw new CartServiceException(ErrorMessages.PRODUCT_NOT_FOUND.getErrorMessage());
 
         CartItemEntity cartItemEntity = null;
@@ -82,7 +84,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDto updateCartItem(String userId, String cartItemId, CartItemRequestModel cartItemDetails) {
+    public CartDto updateCartItem(String userId, String cartItemId, CartItemDto cartItemDetails) {
         CartEntity cartEntity = getOrCreateCart(userId);
         
         CartItemEntity cartItemEntity = null;

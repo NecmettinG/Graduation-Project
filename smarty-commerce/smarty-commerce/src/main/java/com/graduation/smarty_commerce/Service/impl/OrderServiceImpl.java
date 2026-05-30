@@ -7,7 +7,6 @@ import com.graduation.smarty_commerce.io.Repository.*;
 import com.graduation.smarty_commerce.shared.OrderStatus;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.OrderDto;
-import com.graduation.smarty_commerce.ui.Model.Request.OrderRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -42,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private Utils utils;
 
     @Override
-    public OrderDto createOrder(String userId, OrderRequestModel orderDetails) {
+    public OrderDto createOrder(String userId, OrderDto orderDetails) {
         UserEntity userEntity = userRepository.findByUserId(userId);
         if (userEntity == null) throw new OrderServiceException(ErrorMessages.USER_NOT_FOUND.getErrorMessage());
 
@@ -50,8 +49,9 @@ public class OrderServiceImpl implements OrderService {
         if (cartEntity == null || cartEntity.getCartItems() == null || cartEntity.getCartItems().isEmpty()) {
             throw new OrderServiceException(ErrorMessages.CART_IS_EMPTY.getErrorMessage());
         }
-
+        
         AddressEntity addressEntity = addressRepository.findByAddressId(orderDetails.getAddressId());
+        
         if (addressEntity == null || !addressEntity.getUserDetails().getUserId().equals(userId)) {
             throw new OrderServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": Address");
         }

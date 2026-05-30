@@ -296,8 +296,11 @@ public class UserController {
                                      @PathVariable("commentId") String commentId,
                                      @RequestBody CommentRequestModel commentDetails) {
 
-        CommentDto updateComment = commentService.updateComment(commentId, id, commentDetails);
-        return new ModelMapper().map(updateComment, CommentRest.class);
+        ModelMapper modelMapper = new ModelMapper();
+        CommentDto commentDto = modelMapper.map(commentDetails, CommentDto.class);
+        
+        CommentDto updateComment = commentService.updateComment(commentId, id, commentDto);
+        return modelMapper.map(updateComment, CommentRest.class);
     }
 
     @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")

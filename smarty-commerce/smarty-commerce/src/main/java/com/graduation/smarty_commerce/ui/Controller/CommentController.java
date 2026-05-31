@@ -10,6 +10,7 @@ import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationName;
 import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationStatus;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,9 @@ public class CommentController {
         List<CommentDto> comments = commentService.getProductComments(productId);
 
         Type listType = new TypeToken<List<CommentRest>>() {}.getType();
-        return new ModelMapper().map(comments, listType);
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper.map(comments, listType);
     }
 
     @PostMapping("/users/{userId}")
@@ -40,6 +43,7 @@ public class CommentController {
                                                      @PathVariable String userId,
                                                      @RequestBody CommentRequestModel commentDetails) {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CommentDto commentDto = modelMapper.map(commentDetails, CommentDto.class);
         CommentDto createdComment = commentService.createComment(productId, userId, commentDto);
         CommentRest returnValue = modelMapper.map(createdComment, CommentRest.class);
@@ -54,8 +58,9 @@ public class CommentController {
                                      @PathVariable String userId,
                                      @RequestBody CommentRequestModel commentDetails) {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CommentDto commentDto = modelMapper.map(commentDetails, CommentDto.class);
-        CommentDto updateComment = commentService.updateComment(commentId, userId, commentDto);
+        CommentDto updateComment = commentService.updateComment(commentId, userId, commentDto, productId);
         return modelMapper.map(updateComment, CommentRest.class);
     }
 
@@ -67,7 +72,7 @@ public class CommentController {
         OperationStatusModel returnValue = new OperationStatusModel();
         returnValue.setOperationName(RequestOperationName.DELETE.name());
 
-        commentService.deleteComment(commentId, userId);
+        commentService.deleteComment(commentId, userId, productId);
 
         returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
         return returnValue;

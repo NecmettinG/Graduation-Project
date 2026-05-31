@@ -102,9 +102,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto updateComment(String commentId, String userId, CommentDto commentDetails) {
+    public CommentDto updateComment(String commentId, String userId, CommentDto commentDetails, String productId) {
         CommentEntity commentEntity = commentRepository.findByCommentId(commentId);
         if (commentEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": Comment");
+
+        if (productId != null && !commentEntity.getProduct().getProductId().equals(productId)) {
+            throw new RuntimeException("Comment does not belong to the specific product.");
+        }
 
         if (!commentEntity.getUser().getUserId().equals(userId)) {
             throw new RuntimeException("You are not authorized to update this comment!");
@@ -117,9 +121,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(String commentId, String userId) {
+    public void deleteComment(String commentId, String userId, String productId) {
         CommentEntity commentEntity = commentRepository.findByCommentId(commentId);
         if (commentEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": Comment");
+
+        if (productId != null && !commentEntity.getProduct().getProductId().equals(productId)) {
+            throw new RuntimeException("Comment does not belong to the specific product.");
+        }
 
         // Assuming checking happens in Controller via PreAuthorize or here
         if (!commentEntity.getUser().getUserId().equals(userId)) {

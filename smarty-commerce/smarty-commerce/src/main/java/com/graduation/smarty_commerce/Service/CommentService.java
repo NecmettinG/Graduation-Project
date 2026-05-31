@@ -8,6 +8,6 @@ public interface CommentService {
     CommentDto createComment(String productId, String userId, CommentDto commentDetails);
     List<CommentDto> getProductComments(String productId);
     List<CommentDto> getUserComments(String userId);
-    CommentDto updateComment(String commentId, String userId, CommentDto commentDetails);
-    void deleteComment(String commentId, String userId);
+    CommentDto updateComment(String commentId, String userId, CommentDto commentDetails, String productId);
+    void deleteComment(String commentId, String userId, String productId);
 }

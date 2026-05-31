@@ -312,7 +312,8 @@ public class UserController {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CommentDto commentDto = modelMapper.map(commentDetails, CommentDto.class);
         
-        CommentDto updateComment = commentService.updateComment(commentId, id, commentDto);
+        // Pass null for productId since UserController doesn't know it.
+        CommentDto updateComment = commentService.updateComment(commentId, id, commentDto, null);
         return modelMapper.map(updateComment, CommentRest.class);
     }
 
@@ -323,7 +324,8 @@ public class UserController {
         OperationStatusModel returnValue = new OperationStatusModel();
         returnValue.setOperationName(RequestOperationName.DELETE.name());
 
-        commentService.deleteComment(commentId, id);
+        // Pass null for productId since UserController doesn't know it.
+        commentService.deleteComment(commentId, id, null);
 
         returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 

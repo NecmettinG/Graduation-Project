@@ -17,6 +17,7 @@ public enum ErrorMessages {
     ORDER_NOT_FOUND("Order not found!"),
     UNAUTHORIZED_ORDER_ACTION("Order does not belong to this user!"),
     ORDER_CANCELLATION_NOT_ALLOWED("Only PENDING orders can be cancelled!"),
+    ORDER_DELETION_NOT_ALLOWED("Only PENDING and CANCELLED orders can be deleted!"),
     PRODUCT_NOT_FOUND("Product not found!"),
     CART_ITEM_NOT_FOUND("Cart item not found!");
 

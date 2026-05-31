@@ -10,6 +10,7 @@ import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationName;
 import com.graduation.smarty_commerce.ui.Model.Response.RequestOperationStatus;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderRest> createOrder(@PathVariable String userId, @RequestBody OrderRequestModel orderDetails) {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         OrderDto orderDto = modelMapper.map(orderDetails, OrderDto.class);
 
         OrderDto createdOrder = orderService.createOrder(userId, orderDto);
@@ -46,6 +48,7 @@ public class OrderController {
         OrderDto orderDto = orderService.getOrder(orderId);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(orderDto, OrderRest.class);
     }
 
@@ -55,6 +58,7 @@ public class OrderController {
         List<OrderDto> orders = orderService.getOrders(userId);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Type listType = new TypeToken<List<OrderRest>>() {}.getType();
         return modelMapper.map(orders, listType);
     }
@@ -65,6 +69,7 @@ public class OrderController {
         OrderDto cancelledOrder = orderService.cancelOrder(userId, orderId);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(cancelledOrder, OrderRest.class);
     }
 

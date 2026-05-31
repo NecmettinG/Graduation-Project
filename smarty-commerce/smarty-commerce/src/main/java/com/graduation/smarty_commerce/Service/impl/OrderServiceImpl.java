@@ -12,6 +12,7 @@ import com.graduation.smarty_commerce.shared.dto.OrderDto;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -154,6 +155,7 @@ public class OrderServiceImpl implements OrderService {
         cartRepository.save(cartEntity);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(storedOrder, OrderDto.class);
     }
 
@@ -163,6 +165,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderEntity == null) throw new OrderServiceException(ErrorMessages.ORDER_NOT_FOUND.getErrorMessage());
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(orderEntity, OrderDto.class);
     }
 
@@ -171,6 +174,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderEntity> orderEntities = orderRepository.findByUserUserId(userId);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Type listType = new TypeToken<List<OrderDto>>() {}.getType();
         return modelMapper.map(orderEntities, listType);
     }
@@ -200,6 +204,7 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity updatedOrder = orderRepository.save(orderEntity);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(updatedOrder, OrderDto.class);
     }
 

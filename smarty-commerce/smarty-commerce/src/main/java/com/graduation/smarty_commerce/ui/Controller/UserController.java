@@ -16,6 +16,7 @@ import com.graduation.smarty_commerce.ui.Model.Request.PasswordResetRequestModel
 import com.graduation.smarty_commerce.ui.Model.Request.UserDetailsRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Response.*;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -52,6 +53,7 @@ public class UserController {
         UserDto userDto = userService.getUserByUserId(id);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         returnValue = modelMapper.map(userDto, UserRest.class);
 
@@ -68,6 +70,7 @@ public class UserController {
         List<UserDto> users = userService.getUsers(page, limit);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         for (UserDto userDto : users) {
 
@@ -94,6 +97,7 @@ public class UserController {
         }
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         UserDto userDto = modelMapper.map(userDetails, UserDto.class);
 
@@ -117,6 +121,7 @@ public class UserController {
         UserDto userDto = new UserDto();
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         userDto = modelMapper.map(userDetails, UserDto.class);
 
@@ -217,7 +222,9 @@ public class UserController {
 
         if (addressDtos != null && !addressDtos.isEmpty()) {
             Type listType = new TypeToken<List<AddressRest>>() {}.getType();
-            returnValue = new ModelMapper().map(addressDtos, listType);
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            returnValue = modelMapper.map(addressDtos, listType);
         }
 
         return returnValue;
@@ -230,6 +237,7 @@ public class UserController {
         AddressDto addressDto = addressService.getAddress(addressId);
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         return modelMapper.map(addressDto, AddressRest.class);
     }
@@ -241,6 +249,7 @@ public class UserController {
     public AddressRest createAddress(@PathVariable("id") String id, @RequestBody AddressRequestModel addressRequestModel) {
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         AddressDto addressDto = modelMapper.map(addressRequestModel, AddressDto.class);
 
         AddressDto createdAddress = addressService.createAddress(id, addressDto);
@@ -257,6 +266,7 @@ public class UserController {
                                      @RequestBody AddressRequestModel addressRequestModel) {
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         AddressDto addressDto = modelMapper.map(addressRequestModel, AddressDto.class);
 
         AddressDto updatedAddress = addressService.updateAddress(addressId, addressDto);
@@ -285,7 +295,9 @@ public class UserController {
         List<CommentDto> comments = commentService.getUserComments(id);
 
         Type listType = new TypeToken<List<CommentRest>>() {}.getType();
-        return new ModelMapper().map(comments, listType);
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper.map(comments, listType);
     }
 
     @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
@@ -297,6 +309,7 @@ public class UserController {
                                      @RequestBody CommentRequestModel commentDetails) {
 
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CommentDto commentDto = modelMapper.map(commentDetails, CommentDto.class);
         
         CommentDto updateComment = commentService.updateComment(commentId, id, commentDto);

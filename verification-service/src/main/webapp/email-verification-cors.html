@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TODO Supply</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script language="javascript">
+
+        $(document).ready(function (){
+
+            verifyEmail()
+
+            function verifyEmail(){
+
+                var settings = {
+                    "async": true,
+                    "url": "http://localhost:8080/smarty-commerce/users/email-verification?token=sdfsdfsdsf",
+                    "method": "GET"
+                }
+
+                $.ajax(settings).done(function (response){
+                    console.log(response)
+                })
+            }
+        })
+    </script>
+</head>
+<body>
+
+<div>This webpage is created for solving CORS issue in Spring Boot Backend.</div>
+
+</body>
+</html>

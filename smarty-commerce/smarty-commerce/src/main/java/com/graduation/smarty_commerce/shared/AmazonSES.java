@@ -22,7 +22,7 @@ public class AmazonSES {
     final String HTMLBODY = "<h1>Please verify your email address</h1>"
             + "<p>Thank you for registering to Smarty-Commerce! To complete registration process and be able to log in,"
             + " click on the following link: "
-            + "<a href='http://localhost:8080/verification-service/email-verification.html?token=$tokenValue'>"
+            + "<a href='http://localhost:8088/verification-service/email-verification.html?token=$tokenValue'>"
             + "Final step to complete your registration" + "</a><br/><br/>"
             + "Thank you! And we are pleased to welcome you!";
 
@@ -30,14 +30,14 @@ public class AmazonSES {
     final String TEXTBODY = "Please verify your email address. "
             + "Thank you for registering to Smarty-Commerce! To complete registration process and be able to log in,"
             + " open then the following URL in your browser window: "
-            + " http://localhost:8080/verification-service/email-verification.html?token=$tokenValue"
+            + " http://localhost:8088/verification-service/email-verification.html?token=$tokenValue"
             + " Thank you! And we are pleased to welcome you!";
 
     final String PASSWORD_RESET_HTMLBODY = "<h1>A request to reset your password</h1>"
             + "<p>Hi, $firstName!</p> "
             + "<p>Someone has requested to reset your password for your Smarty-Commerce account. If it were not you, please ignore it."
             + " otherwise please click on the link below to set a new password: "
-            + "<a href='http://localhost:8080/verification-service/password-reset.html?token=$tokenValue'>"
+            + "<a href='http://localhost:8088/verification-service/password-reset.html?token=$tokenValue'>"
             + " Click this link to Reset Password"
             + "</a><br/><br/>"
             + "Thank you!";
@@ -46,7 +46,7 @@ public class AmazonSES {
             + "Hi, $firstName! "
             + "Someone has requested to reset your password for your Smarty-Commerce account. If it were not you, please ignore it."
             + " otherwise please open the link below in your browser window to set a new password:"
-            + " http://localhost:8080/verification-service/password-reset.html?token=$tokenValue"
+            + " http://localhost:8088/verification-service/password-reset.html?token=$tokenValue"
             + " Thank you!";
 
 

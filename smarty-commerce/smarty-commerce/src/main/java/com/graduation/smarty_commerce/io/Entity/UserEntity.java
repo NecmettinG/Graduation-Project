@@ -56,6 +56,12 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentEntity> comments;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(name="user_wishlist",
+            joinColumns = @JoinColumn(name="user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))
+    private List<ProductEntity> wishlist;
+
     public long getId() {
         return id;
     }
@@ -166,5 +172,13 @@ public class UserEntity implements Serializable {
 
     public void setComments(List<CommentEntity> comments) {
         this.comments = comments;
+    }
+
+    public List<ProductEntity> getWishlist() {
+        return wishlist;
+    }
+
+    public void setWishlist(List<ProductEntity> wishlist) {
+        this.wishlist = wishlist;
     }
 }

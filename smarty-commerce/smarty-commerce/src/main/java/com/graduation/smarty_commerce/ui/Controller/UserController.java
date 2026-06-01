@@ -5,9 +5,11 @@ import com.graduation.smarty_commerce.Service.AddressService;
 import com.graduation.smarty_commerce.Service.impl.AddressServiceImpl;
 import com.graduation.smarty_commerce.Service.impl.CommentServiceImpl;
 import com.graduation.smarty_commerce.Service.impl.UserServiceImpl;
+import com.graduation.smarty_commerce.Service.impl.WishlistServiceImpl;
 import com.graduation.smarty_commerce.shared.Roles;
 import com.graduation.smarty_commerce.shared.dto.AddressDto;
 import com.graduation.smarty_commerce.shared.dto.CommentDto;
+import com.graduation.smarty_commerce.shared.dto.ProductDto;
 import com.graduation.smarty_commerce.shared.dto.UserDto;
 import com.graduation.smarty_commerce.ui.Model.Request.AddressRequestModel;
 import com.graduation.smarty_commerce.ui.Model.Request.CommentRequestModel;
@@ -43,6 +45,9 @@ public class UserController {
 
     @Autowired
     CommentServiceImpl commentService;
+
+    @Autowired
+    WishlistServiceImpl wishlistService;
 
     @PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userId")
     @GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -329,6 +334,41 @@ public class UserController {
 
         returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 
+        return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @GetMapping(path = "/{id}/wishlist", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<ProductRest> getWishlist(@PathVariable("id") String id) {
+        List<ProductDto> wishlist = wishlistService.getWishlist(id);
+
+        Type listType = new TypeToken<List<ProductRest>>() {}.getType();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper.map(wishlist, listType);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @PostMapping(path = "/{id}/wishlist/{productId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel addProductToWishlist(@PathVariable("id") String id, @PathVariable("productId") String productId) {
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName("ADD_TO_WISHLIST");
+
+        wishlistService.addProductToWishlist(id, productId);
+
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    @DeleteMapping(path = "/{id}/wishlist/{productId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel removeProductFromWishlist(@PathVariable("id") String id, @PathVariable("productId") String productId) {
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName("REMOVE_FROM_WISHLIST");
+
+        wishlistService.removeProductFromWishlist(id, productId);
+
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
         return returnValue;
     }
 }

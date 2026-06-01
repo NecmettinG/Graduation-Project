@@ -38,6 +38,7 @@ public class CategoryController {
     public CategoryRest getCategory(@PathVariable String id) {
         CategoryDto categoryDto = categoryService.getCategory(id);
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(categoryDto, CategoryRest.class);
     }
 
@@ -94,6 +95,7 @@ public class CategoryController {
 
         List<CategoryDto> categories = categoryService.getCategories(page, limit);
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         for (CategoryDto categoryDto : categories) {
             returnValue.add(modelMapper.map(categoryDto, CategoryRest.class));

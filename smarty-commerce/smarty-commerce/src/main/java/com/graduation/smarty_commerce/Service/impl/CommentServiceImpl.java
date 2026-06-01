@@ -13,6 +13,7 @@ import com.graduation.smarty_commerce.io.Repository.UserRepository;
 import com.graduation.smarty_commerce.shared.OrderStatus;
 import com.graduation.smarty_commerce.shared.Utils;
 import com.graduation.smarty_commerce.shared.dto.CommentDto;
+import com.graduation.smarty_commerce.shared.dto.UserDto;
 import com.graduation.smarty_commerce.ui.Model.Response.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -41,6 +42,39 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private Utils utils;
 
+    /*
+    COMMENT FEATURE SPEED PROBLEM SOLUTION 1:
+     ModelMapper Lazy-Loading Chain-Reaction:
+     Whenever ModelMapper mapped a list of CommentEntity back to DTOs in getUserComments and getProductComments, it inherently noticed-
+     that your UserDto was packed with multiple collections (Orders, Addresses, Cart, Roles). By default, it fired up-
+     deep nested instantiation to build those massive structural trees, producing literal hundreds of implicit SQL LAZY load queries -
+     (N+1 scenario).
+     Fix: Bypassed ModelMapper for this edge-case mapping completely and generated a dedicated fast mapToDto wrapper that only -
+     safely extracts what the CommentRest controller actually requested-
+     (commentId, content, createdAt and the basic user firstName, lastName). All secondary recursive cartesian DB relationships are -
+     permanently skipped!
+     */
+    private CommentDto mapToDto(CommentEntity entity) {
+        CommentDto dto = new CommentDto();
+        dto.setId(entity.getId());
+        dto.setCommentId(entity.getCommentId());
+        dto.setContent(entity.getContent());
+        dto.setCreatedAt(entity.getCreatedAt());
+
+        if (entity.getUser() != null) {
+            UserDto userDto = new UserDto();
+            userDto.setUserId(entity.getUser().getUserId());
+            userDto.setFirstName(entity.getUser().getFirstName());
+            userDto.setLastName(entity.getUser().getLastName());
+            userDto.setEmail(entity.getUser().getEmail());
+            dto.setUser(userDto);
+        }
+
+        // We skip mapping the entire product to avoid thousands of recursive DB queries, 
+        // as Product info is not needed directly inside CommentRest endpoint payloads.
+        return dto;
+    }
+
     @Override
     public CommentDto createComment(String productId, String userId, CommentDto commentDetails) {
         ProductEntity productEntity = productRepository.findByProductId(productId);
@@ -49,25 +83,9 @@ public class CommentServiceImpl implements CommentService {
         UserEntity userEntity = userRepository.findByUserId(userId);
         if (userEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": User");
 
-        boolean hasPurchased = false;
-        List<OrderEntity> userOrders = orderRepository.findByUserUserId(userId);
-        if (userOrders != null) {
-            for (OrderEntity order : userOrders) {
-                if (order.getOrderStatus() == OrderStatus.DELIVERED) {
-                    if (order.getOrderItems() != null) {
-                        for (OrderItemEntity item : order.getOrderItems()) {
-                            if (item.getProduct().getProductId().equals(productId)) {
-                                hasPurchased = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (hasPurchased) break;
-            }
-        }
+        long purchaseCount = orderRepository.countUserPurchasesOfProduct(userId, productId, OrderStatus.DELIVERED);
 
-        if (!hasPurchased) {
+        if (purchaseCount == 0) {
             throw new RuntimeException("You can only comment on products you have purchased and received.");
         }
 
@@ -79,15 +97,13 @@ public class CommentServiceImpl implements CommentService {
         commentEntity.setUser(userEntity);
 
         CommentEntity storedComment = commentRepository.save(commentEntity);
-        return new ModelMapper().map(storedComment, CommentDto.class);
+        return mapToDto(storedComment);
     }
 
     @Override
     public List<CommentDto> getProductComments(String productId) {
         List<CommentEntity> comments = commentRepository.findByProductProductId(productId);
-
-        Type listType = new TypeToken<List<CommentDto>>() {}.getType();
-        return new ModelMapper().map(comments, listType);
+        return comments.stream().map(this::mapToDto).toList();
     }
 
     @Override
@@ -96,9 +112,7 @@ public class CommentServiceImpl implements CommentService {
         if (userEntity == null) throw new RuntimeException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + ": User");
         
         List<CommentEntity> comments = commentRepository.findByUserUserId(userId);
-
-        Type listType = new TypeToken<List<CommentDto>>() {}.getType();
-        return new ModelMapper().map(comments, listType);
+        return comments.stream().map(this::mapToDto).toList();
     }
 
     @Override
@@ -117,7 +131,7 @@ public class CommentServiceImpl implements CommentService {
         commentEntity.setContent(commentDetails.getContent());
         CommentEntity updatedComment = commentRepository.save(commentEntity);
 
-        return new ModelMapper().map(updatedComment, CommentDto.class);
+        return mapToDto(updatedComment);
     }
 
     @Override

@@ -28,6 +28,15 @@ public class ProductEntity implements Serializable {
     @Column(nullable = false)
     private java.math.BigDecimal price;
 
+    /*
+    OPTIMISTIC LOCKING:
+    How this works: Whenever a transaction retrieves the record from the database, it remembers its specific version identifier.
+    Before updating, JPA automatically throws an exception if the DB version has changed since being fetched-
+    (meaning somebody else grabbed & locked it first).
+    */
+    @Version
+    private Long version;
+
     private int stock;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -77,6 +86,14 @@ public class ProductEntity implements Serializable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public int getStock() {

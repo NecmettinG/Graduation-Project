@@ -23,6 +23,15 @@ public class CartEntity implements Serializable {
 
     private java.math.BigDecimal currentTotal;
 
+    /*
+    OPTIMISTIC LOCKING:
+    How this works: Whenever a transaction retrieves the record from the database, it remembers its specific version identifier.
+    Before updating, JPA automatically throws an exception if the DB version has changed since being fetched-
+    (meaning somebody else grabbed & locked it first).
+    */
+    @Version
+    private Long version;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cart", orphanRemoval = true)
     private List<CartItemEntity> cartItems;
 
@@ -44,6 +53,14 @@ public class CartEntity implements Serializable {
 
     public void setCurrentTotal(BigDecimal currentTotal) {
         this.currentTotal = currentTotal;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public List<CartItemEntity> getCartItems() {

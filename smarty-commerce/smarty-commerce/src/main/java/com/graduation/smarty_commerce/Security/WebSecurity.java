@@ -76,6 +76,12 @@ public class WebSecurity {
                         .permitAll()
                         .requestMatchers("/error")
                         .permitAll()
+                        // Internal data-feed endpoint (JWT validated manually in controller)
+                        .requestMatchers("/internal/**")
+                        .permitAll()
+                        // Product recommendations (public, read-only)
+                        .requestMatchers(HttpMethod.GET, "/products/*/recommendations")
+                        .permitAll()
                         .requestMatchers(SecurityConstants.H2_CONSOLE)
                         .permitAll()
                         .requestMatchers(

@@ -8,7 +8,7 @@ and authenticated via JWT using the shared HMAC secret.
 import logging
 from datetime import datetime, timezone
 
-import jwt
+import jwt  # type: ignore[import-untyped]
 from fastapi import APIRouter, HTTPException, Header, Query
 
 from config import TOKEN_SECRET, DEFAULT_TOP_N

@@ -115,19 +115,22 @@ class TestRecommendationEngine:
         assert "P3" not in rec_ids
         assert "P4" not in rec_ids
 
-    def test_user_recommendations_excludes_interacted_items(self):
-        """UserA ordered P1, P2, P3 and has P4 in cart — no recs should overlap."""
+    def test_user_recommendations_excludes_only_ordered_items(self):
+        """UserA ordered P1, P2, P3 and has P4 in cart.
+        Only ordered products (P1, P2, P3) should be excluded.
+        P4 (cart only) should be eligible for recommendation."""
         engine = RecommendationEngine()
         data = _build_sample_data()
         engine.build_matrix(data)
 
         recs = engine.get_user_recommendations("userA", top_n=5)
         rec_ids = {r.productId for r in recs}
-        # userA interacted with all 4 products, so no recs
+        # Ordered items must be excluded
         assert "P1" not in rec_ids
         assert "P2" not in rec_ids
         assert "P3" not in rec_ids
-        assert "P4" not in rec_ids
+        # P4 is only in cart (not ordered) — should be recommended
+        assert "P4" in rec_ids
 
     def test_unknown_user_returns_empty(self):
         engine = RecommendationEngine()

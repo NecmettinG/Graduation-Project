@@ -1,7 +1,7 @@
 import logging
 
 import httpx
-import jwt
+import jwt  # type: ignore[import-untyped]
 
 from config import SMARTY_COMMERCE_BASE_URL, TOKEN_SECRET
 from models import InteractionData

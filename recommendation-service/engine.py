@@ -42,8 +42,11 @@ class RecommendationEngine:
         # The item-item similarity matrix (n_products x n_products)
         self._similarity_matrix: np.ndarray | None = None
 
-        # Tracks which products each user interacted with (for user-based recs)
+        # Tracks ALL products each user interacted with (for similarity aggregation)
         self._user_products: dict[str, set[str]] = {}
+
+        # Tracks only ORDERED products (for exclusion from user recommendations)
+        self._user_ordered_products: dict[str, set[str]] = {}
 
         # Metadata
         self._last_rebuilt_at: datetime | None = None
@@ -88,11 +91,13 @@ class RecommendationEngine:
         all_products: set[str] = set()
         all_users: set[str] = set()
         self._user_products = {}
+        self._user_ordered_products = {}
 
         for order in interaction_data.orders:
             all_users.add(order.userId)
             all_products.update(order.productIds)
             self._user_products.setdefault(order.userId, set()).update(order.productIds)
+            self._user_ordered_products.setdefault(order.userId, set()).update(order.productIds)
 
         for wishlist in interaction_data.wishlists:
             all_users.add(wishlist.userId)
@@ -206,7 +211,11 @@ class RecommendationEngine:
         Get personalized recommendations for a user based on their interaction history.
 
         Aggregates similarity scores across all products the user has interacted with,
-        then returns the top-N products the user hasn't already interacted with.
+        then returns the top-N products the user hasn't already ordered.
+
+        Note: Only ORDERED products are excluded. Wishlisted and carted items remain
+        eligible since they represent purchase intent — recommending them reinforces
+        the user's interest and can drive conversion.
         """
         if not self._is_ready or self._similarity_matrix is None:
             logger.warning("Engine not ready. Returning empty recommendations.")
@@ -217,21 +226,22 @@ class RecommendationEngine:
             return []
 
         interacted_products = self._user_products[user_id]
+        ordered_products = self._user_ordered_products.get(user_id, set())
         n_products = len(self._product_to_idx)
 
         # Aggregate similarity scores from all products the user interacted with
         aggregated_scores = np.zeros(n_products, dtype=np.float64)
-        interacted_indices: set[int] = set()
 
         for pid in interacted_products:
             if pid in self._product_to_idx:
                 idx = self._product_to_idx[pid]
-                interacted_indices.add(idx)
                 aggregated_scores += self._similarity_matrix[idx]
 
-        # Zero out products the user already interacted with
-        for idx in interacted_indices:
-            aggregated_scores[idx] = 0.0
+        # Only zero out products the user has already ORDERED (not wishlisted/carted)
+        for pid in ordered_products:
+            if pid in self._product_to_idx:
+                idx = self._product_to_idx[pid]
+                aggregated_scores[idx] = 0.0
 
         # Get top-N
         if n_products <= top_n:
@@ -253,3 +263,4 @@ class RecommendationEngine:
             )
 
         return recommendations[:top_n]
+

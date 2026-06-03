@@ -8,7 +8,7 @@ which is useful during presentations and testing.
 import logging
 from datetime import datetime, timezone
 
-import jwt
+import jwt  # type: ignore[import-untyped]
 from fastapi import APIRouter, HTTPException, Header
 
 from config import TOKEN_SECRET, REBUILD_INTERVAL_MINUTES

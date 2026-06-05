@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { usePathname } from "next/navigation";
 import styles from "./Navbar.module.css";
 
 export function Navbar() {
   const { user, logout, loading } = useAuth();
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/admin")) return null;
 
   return (
     <header className={styles.header}>
@@ -22,6 +26,8 @@ export function Navbar() {
             user ? (
               <div className={styles.userMenu}>
                 <span className={styles.greeting}>Hi, {user.firstName}</span>
+                <Link href="/wishlist" className={styles.navLink}>Wishlist</Link>
+                <Link href="/orders" className={styles.navLink}>Orders</Link>
                 <Link href="/profile" className={styles.navLink}>Profile</Link>
                 <button onClick={logout} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.875rem' }}>Logout</button>
               </div>

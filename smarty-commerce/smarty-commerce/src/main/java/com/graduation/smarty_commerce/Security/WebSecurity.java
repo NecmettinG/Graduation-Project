@@ -79,8 +79,10 @@ public class WebSecurity {
                         // Internal data-feed endpoint (JWT validated manually in controller)
                         .requestMatchers("/internal/**")
                         .permitAll()
-                        // Product recommendations (public, read-only)
-                        .requestMatchers(HttpMethod.GET, "/products/*/recommendations")
+                        // Product recommendations and catalog (public, read-only)
+                        .requestMatchers(HttpMethod.GET, "/products", "/products/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categories", "/categories/**")
                         .permitAll()
                         .requestMatchers(SecurityConstants.H2_CONSOLE)
                         .permitAll()
@@ -118,6 +120,7 @@ public class WebSecurity {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "UserId"));
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

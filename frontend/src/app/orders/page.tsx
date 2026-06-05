@@ -21,7 +21,14 @@ export default function OrdersPage() {
     async function fetchOrders() {
       try {
         const data = await fetchCoreApi(`/users/${user?.userId}/orders`, { requireAuth: true });
-        setOrders(Array.isArray(data) ? data : (data.content || []));
+        const ordersList = Array.isArray(data) ? data : (data.content || []);
+        // Sort orders by date descending (newest first)
+        ordersList.sort((a: any, b: any) => {
+          if (!a.orderDate) return 1;
+          if (!b.orderDate) return -1;
+          return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
+        });
+        setOrders(ordersList);
       } catch (err) {
         console.warn("Failed to fetch orders", err);
       } finally {
@@ -50,11 +57,43 @@ export default function OrdersPage() {
           {orders.map((order, idx) => (
             <div key={idx} className="glass-panel" style={{ padding: "1.5rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem", marginBottom: "1rem" }}>
-                <strong>Order #{order.orderId || idx + 1000}</strong>
-                <span style={{ color: "var(--text-secondary)" }}>{order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "Recent"}</span>
+                <div>
+                  <strong>Order #{order.orderId || idx + 1000}</strong>
+                  <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
+                    Status: <span style={{ color: "var(--accent-primary)", fontWeight: 500 }}>{order.orderStatus || "PROCESSING"}</span>
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <span style={{ color: "var(--text-secondary)" }}>{order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "Recent"}</span>
+                  <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
+                    Payment: <span style={{ fontWeight: 500 }}>{order.paymentStatus || "PAID"}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                Total Amount: <strong style={{ color: "var(--accent-primary)" }}>${order.totalAmount?.toFixed(2) || "0.00"}</strong>
+              
+              <div style={{ marginBottom: "1.5rem" }}>
+                {order.orderItems && order.orderItems.length > 0 ? (
+                  <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
+                    {order.orderItems.map((item: any, i: number) => {
+                      const product = item.product || {};
+                      return (
+                        <li key={i} style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", fontSize: "0.95rem" }}>
+                          <span>{item.quantity}x {product.productName || "Product"}</span>
+                          <span>${(product.price * item.quantity).toFixed(2)}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <div style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No item details available.</div>
+                )}
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px dashed var(--border-color)", paddingTop: "1rem" }}>
+                <span style={{ color: "var(--text-secondary)" }}>Shipping to: {order.shippingAddress || "Default Address"}</span>
+                <div>
+                  Total Amount: <strong style={{ color: "var(--accent-primary)", fontSize: "1.25rem", marginLeft: "0.5rem" }}>${order.totalAmount?.toFixed(2) || "0.00"}</strong>
+                </div>
               </div>
             </div>
           ))}

@@ -58,7 +58,8 @@ async def get_product_recommendations(
     Returns the top-N most similar products based on co-purchase patterns
     computed via cosine similarity on the weighted interaction matrix.
     """
-    _verify_jwt(authorization)
+    # Product recommendations are public, no JWT verification needed.
+    # _verify_jwt(authorization)
 
     if _engine is None or not _engine.is_ready:
         raise HTTPException(status_code=503, detail="Recommendation engine is not ready yet")

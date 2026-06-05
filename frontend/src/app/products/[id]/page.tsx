@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { fetchCoreApi, fetchRecApi } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/Button";
 import { ProductCard } from "@/components/ProductCard";
 import styles from "./page.module.css";
@@ -27,16 +28,12 @@ export default function ProductDetailPage() {
 
         // Fetch Similar Items from recommendation service
         try {
-          const recs = await fetchRecApi(`/recommendations/${id}?top_n=4`);
-          if (recs && recs.length > 0) {
-            const productPromises = recs.map((r: any) => 
-              fetchCoreApi(`/products/${r.productId}`).catch(() => null)
-            );
-            const resolvedRecs = await Promise.all(productPromises);
-            setSimilarProducts(resolvedRecs.filter(p => p !== null));
+          const products = await fetchCoreApi(`/products/${id}/recommendations?limit=4`);
+          if (products && products.length > 0) {
+            setSimilarProducts(products);
           }
-        } catch (recErr) {
-          console.warn("Could not fetch similar items", recErr);
+        } catch (err) {
+          console.warn("Could not fetch similar items", err);
         }
       } catch (err) {
         console.error("Failed to load product", err);
@@ -48,17 +45,51 @@ export default function ProductDetailPage() {
     loadData();
   }, [id]);
 
+  const { user } = useAuth();
+  const router = useRouter();
+
   const handleAddToCart = async () => {
+    if (!user) {
+      alert("Please login to add items to your cart.");
+      router.push("/login");
+      return;
+    }
+
     setAddingToCart(true);
     try {
-      // Typically we would post to /cart here and include JWT token
-      // Mocking realistic interaction delay
-      await new Promise(res => setTimeout(res, 500));
-      alert("Added to cart successfully!");
+      await fetchCoreApi(`/users/${user.userId}/cart/items`, {
+        method: "POST",
+        requireAuth: true,
+        body: JSON.stringify({
+          productId: id,
+          quantity: 1
+        })
+      });
+      alert(`${product.productName} added to cart!`);
     } catch (err) {
+      console.error(err);
       alert("Failed to add to cart");
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const handleWishlist = async () => {
+    if (!user) {
+      alert("Please login to add items to your wishlist.");
+      router.push("/login");
+      return;
+    }
+
+    try {
+      await fetchCoreApi(`/users/${user.userId}/wishlist/${id}`, {
+        method: "POST",
+        requireAuth: true
+      });
+      alert(`${product.productName} added to wishlist!`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add to wishlist");
     }
   };
 
@@ -69,15 +100,15 @@ export default function ProductDetailPage() {
     <div className={styles.container}>
       <div className={`container ${styles.productLayout}`}>
         <div className={styles.imageGallery}>
-          {product.imageUrl ? (
-            <img src={product.imageUrl} alt={product.name} className={styles.mainImage} />
+          {product.imageUrls && product.imageUrls.length > 0 ? (
+            <img src={product.imageUrls[0]} alt={product.productName} className={styles.mainImage} />
           ) : (
             <div className={styles.placeholderImage}>No Image Available</div>
           )}
         </div>
         
         <div className={styles.productInfo}>
-          <h1 className={styles.title}>{product.name}</h1>
+          <h1 className={styles.title}>{product.productName}</h1>
           <div className={styles.price}>${product.price?.toFixed(2)}</div>
           
           <div className={styles.description}>
@@ -88,7 +119,7 @@ export default function ProductDetailPage() {
             <Button onClick={handleAddToCart} disabled={addingToCart} className={styles.addBtn}>
               {addingToCart ? "Adding..." : "Add to Cart"}
             </Button>
-            <Button variant="outline" className={styles.wishlistBtn}>
+            <Button variant="outline" className={styles.wishlistBtn} onClick={handleWishlist}>
               ♡ Wishlist
             </Button>
           </div>

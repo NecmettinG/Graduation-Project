@@ -12,22 +12,19 @@ export default function Home() {
   const { user } = useAuth();
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [allCategories, setAllCategories] = useState<any[]>([]);
+  const [fadeState, setFadeState] = useState<'in' | 'out'>('in');
 
   useEffect(() => {
     async function loadRecommendations() {
       try {
         if (user) {
-          // Fetch personalized recommendations from Python service
-          const recs = await fetchRecApi(`/recommendations/user/${user.userId}?top_n=4`);
-          
-          // The Python service returns a list of { productId, score }. 
-          // We need to fetch the actual product details from the Java backend.
-          if (recs && recs.length > 0) {
-            const productPromises = recs.map((r: any) => 
-              fetchCoreApi(`/products/${r.productId}`).catch(() => null)
-            );
-            const products = await Promise.all(productPromises);
-            setRecommendations(products.filter(p => p !== null));
+          // Fetch personalized recommendations from Java proxy (which calls Python service)
+          const products = await fetchCoreApi(`/users/${user.userId}/recommendations?limit=4`, { requireAuth: true });
+
+          if (products && products.length > 0) {
+            setRecommendations(products);
           } else {
             // Fallback if no personalized recs
             await fetchFallbackProducts();
@@ -47,7 +44,7 @@ export default function Home() {
     async function fetchFallbackProducts() {
       try {
         // Just fetch the first page of products from Java backend as fallback
-        const data = await fetchCoreApi("/products?page=0&limit=4");
+        const data = await fetchCoreApi("/products?page=1&limit=4");
         // Assuming backend returns an array or an object with content array
         setRecommendations(Array.isArray(data) ? data.slice(0, 4) : (data.content || []).slice(0, 4));
       } catch (e) {
@@ -55,7 +52,48 @@ export default function Home() {
       }
     }
 
+    let categoryInterval: NodeJS.Timeout;
+
+    async function loadCategories() {
+      try {
+        const data = await fetchCoreApi('/categories?limit=50');
+        const fetchedCats = Array.isArray(data) ? data : (data.content || []);
+
+        if (fetchedCats.length > 0) {
+          // Filter out duplicate categories by categoryId (or categoryName if id is missing)
+          const uniqueCatsMap = new Map();
+          fetchedCats.forEach(c => {
+            const key = c.categoryId || c.categoryName;
+            if (key) uniqueCatsMap.set(key, c);
+          });
+          const uniqueCats = Array.from(uniqueCatsMap.values());
+
+          setAllCategories(uniqueCats);
+          // Initial slice
+          setCategories([...uniqueCats].sort(() => 0.5 - Math.random()).slice(0, 4));
+
+          // Set up 15-second interval
+          categoryInterval = setInterval(() => {
+            setFadeState('out'); // Trigger fade out
+
+            setTimeout(() => {
+              // Swap categories while invisible
+              setCategories([...uniqueCats].sort(() => 0.5 - Math.random()).slice(0, 4));
+              setFadeState('in'); // Trigger fade in
+            }, 300); // Wait 300ms for fade out to complete
+          }, 15000);
+        }
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    }
+
     loadRecommendations();
+    loadCategories();
+
+    return () => {
+      if (categoryInterval) clearInterval(categoryInterval);
+    };
   }, [user]);
 
   return (
@@ -83,12 +121,31 @@ export default function Home() {
             <h2>Shop by Category</h2>
             <Link href="/categories" className={styles.viewAll}>View All</Link>
           </div>
-          <div className={styles.categoryGrid}>
-            {['Electronics', 'Fashion', 'Home Decor', 'Sports'].map((cat, idx) => (
-              <div key={idx} className={`glass-panel ${styles.categoryCard}`}>
-                <h3>{cat}</h3>
-              </div>
-            ))}
+          <div
+            className={styles.categoryGrid}
+            style={{
+              opacity: fadeState === 'in' ? 1 : 0,
+              transition: 'opacity 0.3s ease-in-out'
+            }}
+          >
+            {categories.length > 0 ? categories.map((cat, idx) => (
+              <Link href={`/products?category=${cat.categoryId}`} key={cat.categoryId || idx} style={{ textDecoration: 'none' }}>
+                <div className={`glass-panel ${styles.categoryCard}`} style={{ cursor: "pointer", transition: "transform 0.2s" }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                  onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}>
+                  <h3>{cat.categoryName}</h3>
+                </div>
+              </Link>
+            )) : (
+              // Fallback skeleton or default
+              ['Electronics', 'Fashion', 'Home Decor', 'Sports'].map((cat, idx) => (
+                <Link href="/products" key={idx} style={{ textDecoration: 'none' }}>
+                  <div className={`glass-panel ${styles.categoryCard}`} style={{ cursor: "pointer", opacity: 0.5 }}>
+                    <h3>{cat}</h3>
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -99,7 +156,7 @@ export default function Home() {
           <div className={styles.sectionHeader}>
             <h2>{user ? "Recommended For You" : "Trending Products"}</h2>
           </div>
-          
+
           {loadingRecs ? (
             <div className={styles.loadingState}>Analyzing your preferences...</div>
           ) : recommendations.length > 0 ? (

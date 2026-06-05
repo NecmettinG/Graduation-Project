@@ -46,13 +46,32 @@ export default function CartPage() {
 
   const handleRemove = async (itemId: string) => {
     try {
-      await fetchCoreApi(`/users/${user?.userId}/cart/${itemId}`, { 
+      await fetchCoreApi(`/users/${user?.userId}/cart/items/${itemId}`, { 
         method: 'DELETE',
         requireAuth: true
       });
-      setCartItems(prev => prev.filter(item => item.id !== itemId));
+      setCartItems(prev => prev.filter(item => (item.cartItemId || item.id) !== itemId));
     } catch (e) {
       alert("Failed to remove item");
+    }
+  };
+
+  const handleUpdateQuantity = async (itemId: string, currentQty: number, change: number, product: any) => {
+    const newQty = currentQty + change;
+    if (newQty < 1) return; // Can't have 0, use remove instead
+    
+    try {
+      await fetchCoreApi(`/users/${user?.userId}/cart/items/${itemId}`, {
+        method: "PUT",
+        requireAuth: true,
+        body: JSON.stringify({
+          productId: product.productId,
+          quantity: newQty
+        })
+      });
+      setCartItems(prev => prev.map(item => (item.cartItemId || item.id) === itemId ? { ...item, quantity: newQty } : item));
+    } catch (err) {
+      alert("Failed to update quantity");
     }
   };
 
@@ -86,19 +105,28 @@ export default function CartPage() {
               {cartItems.map((item, idx) => {
                 const product = item.product || item;
                 const price = product.price || 0;
+                const qty = item.quantity || 1;
                 return (
-                  <div key={item.id || idx} className={`glass-panel ${styles.cartItem}`}>
+                  <div key={item.cartItemId || item.id || idx} className={`glass-panel ${styles.cartItem}`}>
                     <div className={styles.itemImagePlaceholder}>
-                      {product.imageUrl ? <img src={product.imageUrl} alt={product.name} /> : "Item"}
+                      {product.imageUrls && product.imageUrls.length > 0 ? <img src={product.imageUrls[0]} alt={product.productName} /> : "Item"}
                     </div>
                     <div className={styles.itemDetails}>
-                      <h3>{product.name}</h3>
+                      <h3>{product.productName}</h3>
                       <p className={styles.price}>${price.toFixed(2)}</p>
-                      <div className={styles.qtyControls}>
-                        <span>Qty: {item.quantity || 1}</span>
+                      <div className={styles.qtyControls} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
+                        <button 
+                          onClick={() => handleUpdateQuantity(item.cartItemId || item.id, qty, -1, product)}
+                          style={{ background: "var(--border-color)", border: "none", width: "24px", height: "24px", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
+                        >-</button>
+                        <span>{qty}</span>
+                        <button 
+                          onClick={() => handleUpdateQuantity(item.cartItemId || item.id, qty, 1, product)}
+                          style={{ background: "var(--border-color)", border: "none", width: "24px", height: "24px", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
+                        >+</button>
                       </div>
                     </div>
-                    <button onClick={() => handleRemove(item.id)} className={styles.removeBtn}>
+                    <button onClick={() => handleRemove(item.cartItemId || item.id)} className={styles.removeBtn}>
                       Remove
                     </button>
                   </div>

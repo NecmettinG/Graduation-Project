@@ -1,7 +1,14 @@
+"use client";
+
 import styles from "./Footer.module.css";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/admin")) return null;
+
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.footerContainer}`}>

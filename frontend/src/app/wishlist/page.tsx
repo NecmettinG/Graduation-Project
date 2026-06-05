@@ -33,6 +33,21 @@ export default function WishlistPage() {
     fetchWishlist();
   }, [user, authLoading, router]);
 
+  const handleRemove = async (productId: string) => {
+    try {
+      await fetchCoreApi(`/users/${user?.userId}/wishlist/${productId}`, {
+        method: "DELETE",
+        requireAuth: true
+      });
+      setWishlistItems(prev => prev.filter(item => {
+        const id = item.product?.productId || item.productId;
+        return id !== productId;
+      }));
+    } catch (err) {
+      alert("Failed to remove from wishlist");
+    }
+  };
+
   if (authLoading || loading) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Loading wishlist...</div>;
 
   return (
@@ -48,9 +63,38 @@ export default function WishlistPage() {
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "2rem" }}>
-          {wishlistItems.map((item, idx) => (
-            <ProductCard key={item.id || idx} product={item.product || item} />
-          ))}
+          {wishlistItems.map((item, idx) => {
+            const product = item.product || item;
+            return (
+              <div key={item.id || idx} style={{ position: "relative" }}>
+                <ProductCard product={product} />
+                <button 
+                  onClick={() => handleRemove(product.productId)}
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    background: "rgba(239, 68, 68, 0.9)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: "32px",
+                    height: "32px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: "bold",
+                    zIndex: 10,
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                  }}
+                  title="Remove from Wishlist"
+                >
+                  ✕
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

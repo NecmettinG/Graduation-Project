@@ -118,6 +118,9 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItemEntity> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
+        
+        List<ProductEntity> wishlist = userEntity.getWishlist();
+        boolean wishlistModified = false;
 
         for (CartItemEntity cartItem : cartEntity.getCartItems()) {
             ProductEntity product = cartItem.getProduct();
@@ -141,6 +144,17 @@ public class OrderServiceImpl implements OrderService {
             totalAmount = totalAmount.add(itemTotal);
 
             orderItems.add(orderItem);
+            
+            // Remove from wishlist if present
+            if (wishlist != null) {
+                if (wishlist.removeIf(p -> p.getProductId().equals(product.getProductId()))) {
+                    wishlistModified = true;
+                }
+            }
+        }
+
+        if (wishlistModified) {
+            userRepository.save(userEntity);
         }
 
         orderEntity.setOrderItems(orderItems);
@@ -177,6 +191,20 @@ public class OrderServiceImpl implements OrderService {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Type listType = new TypeToken<List<OrderDto>>() {}.getType();
         return modelMapper.map(orderEntities, listType);
+    }
+
+    @Override
+    public List<OrderDto> getAllOrders(int page, int limit) {
+        if (page > 0) page = page - 1;
+
+        org.springframework.data.domain.Pageable pageableRequest = org.springframework.data.domain.PageRequest.of(page, limit);
+        org.springframework.data.domain.Page<OrderEntity> ordersPage = orderRepository.findAll(pageableRequest);
+        List<OrderEntity> orders = ordersPage.getContent();
+
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Type listType = new TypeToken<List<OrderDto>>() {}.getType();
+        return modelMapper.map(orders, listType);
     }
 
     @Override

@@ -1,0 +1,126 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%);
+  color: white;
+  padding: 8rem 0 6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(circle at top right, rgba(255,215,0,0.15) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.heroContent {
+  max-width: 600px;
+  position: relative;
+  z-index: 10;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  color: #FFFFFF;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Section Shared */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+}
+
+.sectionHeader h2 {
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+
+.viewAll {
+  color: var(--accent-primary);
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.viewAll:hover {
+  color: var(--accent-primary-hover);
+  text-decoration: underline;
+}
+
+/* Categories */
+.categories {
+  padding: 5rem 0;
+  background-color: var(--bg-base);
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.categoryCard {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  background: linear-gradient(135deg, var(--bg-surface) 0%, #FFFFFF 100%);
+}
+
+.categoryCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-secondary);
+}
+
+.categoryCard h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+/* Recommendations */
+.recommendations {
+  padding: 5rem 0;
+  background-color: var(--bg-surface);
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.loadingState, .emptyState {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+  font-style: italic;
+}

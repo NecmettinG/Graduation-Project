@@ -3,36 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <title>Email Verification Service</title>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --accent-primary: #305CDE;
+            --accent-secondary: #FFD700;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: var(--bg-base);
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            border-top: 4px solid var(--accent-primary);
+        }
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--accent-primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .success { color: #10B981; }
+        .error { color: #EF4444; }
+        p { color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.5rem; }
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-secondary);
+            color: #0F172A;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { background-color: #E5C100; transform: translateY(-2px); }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script language="JavaScript">
-
         $(document).ready(function () {
+            $("#loading").show();
             var urlParams = new URLSearchParams(location.search);
             if (urlParams.has('token')){
-
-
                 verifyToken(urlParams.get('token'));
+            } else {
+                $("#loading").hide();
+                $("#not-successful-result").show();
             }
 
             function verifyToken(tokenValue){
-
-
                 $.get('http://localhost:8080/smarty-commerce/users/email-verification', {token: tokenValue})
                     .done(function (response){
-
-
+                        $("#loading").hide();
                         if(response["operationResult"] === "SUCCESS"){
-
-                            $("#not-successful-result").attr("style", "display: none !important;");
-                            $("#successful-result").attr("style", "display: block !important;");
+                            $("#successful-result").show();
                         }
                         else{
-
-                            $("#successful-result").attr("style", "display: none !important;");
-                            $("#not-successful-result").attr("style", "display: block !important;");
+                            $("#not-successful-result").show();
                         }
+                    })
+                    .fail(function() {
+                        $("#loading").hide();
+                        $("#not-successful-result").show();
                     });
             }
         });
@@ -40,8 +93,25 @@
 </head>
 <body>
 
-<div id="successful-result" style="display:none">Successful verification</div>
-<div id="not-successful-result" style="display:none">Verification link has expired</div>
+<div class="container">
+    <div id="loading">
+        <h1>Verifying...</h1>
+        <p>Please wait while we verify your email address.</p>
+    </div>
+
+    <div id="successful-result" style="display:none">
+        <div class="icon success">✓</div>
+        <h1>Success!</h1>
+        <p>Your email has been successfully verified. You can now login to your account.</p>
+        <a href="http://localhost:3000/login" class="btn">Go to Login</a>
+    </div>
+    
+    <div id="not-successful-result" style="display:none">
+        <div class="icon error">✕</div>
+        <h1>Verification Failed</h1>
+        <p>Your verification link is invalid or has expired.</p>
+    </div>
+</div>
 
 </body>
 </html>

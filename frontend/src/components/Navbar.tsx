@@ -25,10 +25,11 @@ export function Navbar() {
           {!loading && (
             user ? (
               <div className={styles.userMenu}>
-                <span className={styles.greeting}>Hi, {user.firstName}</span>
                 <Link href="/wishlist" className={styles.navLink}>Wishlist</Link>
                 <Link href="/orders" className={styles.navLink}>Orders</Link>
-                <Link href="/profile" className={styles.navLink}>Profile</Link>
+                <Link href="/profile" className={styles.navLink} style={{ fontWeight: 600, color: "var(--accent-primary)" }}>
+                  Hi, {user.firstName}
+                </Link>
                 <button onClick={logout} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.875rem' }}>Logout</button>
               </div>
             ) : (

@@ -14,6 +14,9 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<any>(null);
   const [similarProducts, setSimilarProducts] = useState<any[]>([]);
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
 
@@ -34,6 +37,15 @@ export default function ProductDetailPage() {
           }
         } catch (err) {
           console.warn("Could not fetch similar items", err);
+        }
+        // Fetch Comments
+        try {
+          const fetchedComments = await fetchCoreApi(`/products/${id}/comments`);
+          if (Array.isArray(fetchedComments)) {
+            setComments(fetchedComments);
+          }
+        } catch (err) {
+          console.warn("Could not fetch comments", err);
         }
       } catch (err) {
         console.error("Failed to load product", err);
@@ -93,6 +105,38 @@ export default function ProductDetailPage() {
     }
   };
 
+  const handlePostComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      alert("Please login to post a comment.");
+      router.push("/login");
+      return;
+    }
+    if (!newComment.trim()) return;
+
+    setIsSubmittingComment(true);
+    try {
+      await fetchCoreApi(`/products/${id}/comments/users/${user.userId}`, {
+        method: "POST",
+        requireAuth: true,
+        body: JSON.stringify({ content: newComment })
+      });
+      setNewComment("");
+      
+      // Reload comments
+      const fetchedComments = await fetchCoreApi(`/products/${id}/comments`);
+      if (Array.isArray(fetchedComments)) {
+        setComments(fetchedComments);
+      }
+      alert("Comment posted successfully!");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Failed to post comment.");
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
   if (loading) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Loading...</div>;
   if (!product) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Product not found</div>;
 
@@ -125,6 +169,57 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      <section className="container" style={{ marginTop: "4rem", marginBottom: "4rem" }}>
+        <h2 className={styles.sectionTitle}>Customer Reviews</h2>
+        
+        <div style={{ background: "var(--bg-secondary)", borderRadius: "12px", padding: "2rem", border: "1px solid var(--border-color)", marginBottom: "2rem" }}>
+          {user ? (
+            <form onSubmit={handlePostComment} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <textarea 
+                placeholder="Share your thoughts about this product..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                style={{ width: "100%", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-primary)", color: "var(--text-primary)", minHeight: "100px", fontFamily: "inherit", resize: "vertical" }}
+                required
+              />
+              <div style={{ alignSelf: "flex-end" }}>
+                <Button type="submit" disabled={isSubmittingComment || !newComment.trim()}>
+                  {isSubmittingComment ? "Posting..." : "Post Comment"}
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div style={{ textAlign: "center", padding: "1rem" }}>
+              <p style={{ color: "var(--text-secondary)", marginBottom: "1rem" }}>Please login to leave a review.</p>
+              <Button variant="outline" onClick={() => router.push("/login")}>Login to Comment</Button>
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          {comments.length > 0 ? comments.map(comment => (
+            <div key={comment.commentId} style={{ padding: "1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.5rem" }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "bold" }}>
+                  {comment.user?.firstName?.charAt(0) || "U"}
+                </div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: "1rem" }}>{comment.user?.firstName} {comment.user?.lastName}</h4>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+                    {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : "Just now"}
+                  </span>
+                </div>
+              </div>
+              <p style={{ margin: "1rem 0 0 0", lineHeight: 1.6, color: "var(--text-primary)" }}>{comment.content}</p>
+            </div>
+          )) : (
+            <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-secondary)" }}>
+              No comments yet. Be the first to review this product!
+            </div>
+          )}
+        </div>
+      </section>
 
       {similarProducts.length > 0 && (
         <section className={styles.similarSection}>

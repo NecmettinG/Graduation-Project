@@ -3,7 +3,8 @@ Scheduler for periodic similarity matrix rebuilds.
 
 Uses APScheduler's AsyncIOScheduler to run a background job that:
 1. Fetches fresh interaction data from smarty-commerce
-2. Rebuilds the item-item similarity matrix
+2. Fetches the product catalog for Content-Based Filtering
+3. Rebuilds the hybrid item-item similarity matrix
 
 Default interval: 30 minutes (configurable via REBUILD_INTERVAL_MINUTES).
 """
@@ -14,7 +15,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from config import REBUILD_INTERVAL_MINUTES
-from data_fetcher import fetch_interaction_data
+from data_fetcher import fetch_interaction_data, fetch_product_catalog
 from engine import RecommendationEngine
 
 logger = logging.getLogger(__name__)
@@ -23,11 +24,12 @@ _scheduler: AsyncIOScheduler | None = None
 
 
 async def rebuild_job(engine: RecommendationEngine) -> None:
-    """Fetch interaction data and rebuild the similarity matrix."""
+    """Fetch interaction data + product catalog and rebuild the hybrid similarity matrix."""
     try:
         logger.info("Scheduled rebuild started...")
         interaction_data = await fetch_interaction_data()
-        engine.build_matrix(interaction_data)
+        product_catalog = await fetch_product_catalog()
+        engine.build_matrix(interaction_data, product_catalog)
         logger.info("Scheduled rebuild completed successfully.")
     except Exception as e:
         logger.error("Scheduled rebuild failed: %s", str(e), exc_info=True)

@@ -1,10 +1,11 @@
 import logging
+from typing import Optional
 
 import httpx
 import jwt  # type: ignore[import-untyped]
 
 from config import SMARTY_COMMERCE_BASE_URL, TOKEN_SECRET
-from models import InteractionData
+from models import InteractionData, ProductCatalogItem
 
 logger = logging.getLogger(__name__)
 
@@ -60,3 +61,36 @@ async def fetch_interaction_data() -> InteractionData:
         except httpx.RequestError as e:
             logger.error("Connection error fetching data feed: %s", str(e))
             raise
+
+
+async def fetch_product_catalog() -> Optional[list[ProductCatalogItem]]:
+    """
+    Fetch the lightweight product catalog from smarty-commerce's
+    internal data-feed endpoint.
+
+    Returns a list of ProductCatalogItem objects for Content-Based Filtering,
+    or None if the fetch fails (allowing the engine to fall back to CF-only).
+    """
+    url = f"{SMARTY_COMMERCE_BASE_URL}/internal/data-feed/products"
+    token = _generate_service_jwt()
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json",
+    }
+
+    logger.info("Fetching product catalog from %s", url)
+
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        try:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            catalog = [ProductCatalogItem(**item) for item in data]
+            logger.info("Fetched product catalog: %d products", len(catalog))
+            return catalog
+        except httpx.HTTPStatusError as e:
+            logger.error("HTTP error fetching product catalog: %s — %s", e.response.status_code, e.response.text)
+            return None
+        except httpx.RequestError as e:
+            logger.error("Connection error fetching product catalog: %s", str(e))
+            return None

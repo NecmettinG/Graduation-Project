@@ -25,6 +25,20 @@ class InteractionData(BaseModel):
     carts: list[CartInteraction] = []
 
 
+# --- Product catalog models (for Content-Based Filtering) ---
+
+class ProductCatalogItem(BaseModel):
+    """
+    Lightweight product metadata used by the Content-Based Filtering component.
+    Only contains the features needed for CBF similarity computation.
+    """
+    productId: str
+    categoryName: str = ""
+    mainCategoryName: str = ""
+    brand: str = ""
+    price: float = 0.0
+
+
 # --- Recommendation response models ---
 
 class RecommendationItem(BaseModel):
@@ -37,7 +51,7 @@ class RecommendationResponse(BaseModel):
     sourceUserId: str | None = None
     recommendations: list[RecommendationItem]
     generatedAt: datetime
-    algorithm: str = "item-item-cf-cosine"
+    algorithm: str = "hybrid-cf-cbf-cosine"
 
 
 # --- Admin / status models ---

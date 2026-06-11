@@ -2,6 +2,7 @@ package com.graduation.smarty_commerce.ui.Controller;
 
 import com.graduation.smarty_commerce.Service.DataFeedService;
 import com.graduation.smarty_commerce.ui.Model.Response.DataFeedResponse;
+import com.graduation.smarty_commerce.ui.Model.Response.ProductCatalogItem;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -13,10 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 
 /**
- * Internal endpoint that exposes aggregated interaction data for the
- * recommendation microservice. Secured by JWT verification — the calling
+ * Internal endpoint that exposes aggregated interaction data and product catalog
+ * for the recommendation microservice. Secured by JWT verification — the calling
  * service must present a valid token signed with the same HMAC secret.
  *
  * This endpoint is excluded from Spring Security's filter chain (permitAll)
@@ -40,6 +42,21 @@ public class DataFeedController {
 
         DataFeedResponse response = dataFeedService.getInteractionData();
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Returns a lightweight product catalog for the Content-Based Filtering
+     * component of the recommendation engine.
+     */
+    @GetMapping("/products")
+    public ResponseEntity<?> getProductCatalog(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isValidServiceToken(authHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("{\"error\": \"Invalid or missing service token\"}");
+        }
+
+        List<ProductCatalogItem> catalog = dataFeedService.getProductCatalog();
+        return ResponseEntity.ok(catalog);
     }
 
     /**

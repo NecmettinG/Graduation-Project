@@ -34,10 +34,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Verify by fetching user details
           const userData = await fetchCoreApi(`/users/${storedUserId}`, { requireAuth: true });
           setUser(userData);
-        } catch (error) {
-          console.error("Token invalid or expired", error);
+        } catch (error: any) {
+          // Next.js dev server shows a full-screen error overlay for console.error
+          // Using console.warn instead since an expired session is an expected flow
+          console.warn("Session expired or user deleted:", error.message);
           removeAuthToken();
           localStorage.removeItem("userId");
+          setUser(null);
         }
       }
       setLoading(false);

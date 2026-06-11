@@ -3,8 +3,10 @@ package com.graduation.smarty_commerce.Service.impl;
 import com.graduation.smarty_commerce.Service.DataFeedService;
 import com.graduation.smarty_commerce.io.Entity.*;
 import com.graduation.smarty_commerce.io.Repository.OrderRepository;
+import com.graduation.smarty_commerce.io.Repository.ProductRepository;
 import com.graduation.smarty_commerce.io.Repository.UserRepository;
 import com.graduation.smarty_commerce.ui.Model.Response.DataFeedResponse;
+import com.graduation.smarty_commerce.ui.Model.Response.ProductCatalogItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +20,7 @@ import java.util.stream.Collectors;
  * Aggregates interaction data from orders, wishlists, and carts
  * into a unified DataFeedResponse for the recommendation service.
  *
- * Each interaction type is grouped by userId, with the associated productIds
- * collected into lists.
+ * Also provides a lightweight product catalog for Content-Based Filtering.
  */
 @Service
 public class DataFeedServiceImpl implements DataFeedService {
@@ -30,6 +31,9 @@ public class DataFeedServiceImpl implements DataFeedService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     @Override
     public DataFeedResponse getInteractionData() {
         List<DataFeedResponse.UserInteraction> orderInteractions = buildOrderInteractions();
@@ -37,6 +41,43 @@ public class DataFeedServiceImpl implements DataFeedService {
         List<DataFeedResponse.UserInteraction> cartInteractions = buildCartInteractions();
 
         return new DataFeedResponse(orderInteractions, wishlistInteractions, cartInteractions);
+    }
+
+    @Override
+    public List<ProductCatalogItem> getProductCatalog() {
+        List<ProductEntity> allProducts = productRepository.findAll();
+        List<ProductCatalogItem> catalog = new ArrayList<>();
+
+        for (ProductEntity product : allProducts) {
+            String categoryName = "";
+            String mainCategoryName = "";
+
+            CategoryEntity category = product.getCategory();
+            if (category != null) {
+                categoryName = category.getCategoryName();
+                MainCategoryEntity mainCategory = category.getMainCategory();
+                if (mainCategory != null) {
+                    mainCategoryName = mainCategory.getCategoryName();
+                }
+            }
+
+            // Extract brand from the attributes JSON map
+            String brand = "";
+            Map<String, Object> attributes = product.getAttributes();
+            if (attributes != null && attributes.containsKey("brand")) {
+                brand = String.valueOf(attributes.get("brand"));
+            }
+
+            catalog.add(new ProductCatalogItem(
+                    product.getProductId(),
+                    categoryName,
+                    mainCategoryName,
+                    brand,
+                    product.getPrice()
+            ));
+        }
+
+        return catalog;
     }
 
     /**

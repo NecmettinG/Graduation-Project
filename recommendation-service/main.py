@@ -1,8 +1,8 @@
 """
 Recommendation Service — FastAPI Application Entry Point
 
-A Python microservice that provides Item-to-Item Collaborative Filtering
-recommendations for the Smarty Commerce e-commerce platform.
+A Python microservice that provides Hybrid (Content-Based + Item-to-Item
+Collaborative Filtering) recommendations for the Smarty Commerce e-commerce platform.
 """
 
 import logging
@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import PORT
 from engine import RecommendationEngine
-from data_fetcher import fetch_interaction_data
+from data_fetcher import fetch_interaction_data, fetch_product_catalog
 from scheduler import start_scheduler, stop_scheduler, rebuild_job
 from routers import recommendations as rec_router
 from routers import admin as admin_router
@@ -34,7 +34,8 @@ engine = RecommendationEngine()
 async def _rebuild_callback():
     """Callback for the admin manual rebuild endpoint."""
     interaction_data = await fetch_interaction_data()
-    engine.build_matrix(interaction_data)
+    product_catalog = await fetch_product_catalog()
+    engine.build_matrix(interaction_data, product_catalog)
 
 
 @asynccontextmanager
@@ -51,12 +52,13 @@ async def lifespan(app: FastAPI):
     admin_router.set_engine(engine)
     admin_router.set_rebuild_callback(_rebuild_callback)
 
-    # Initial build — fetch data and build the similarity matrix
+    # Initial build — fetch data and build the hybrid similarity matrix
     try:
         logger.info("Performing initial data fetch and matrix build...")
         interaction_data = await fetch_interaction_data()
-        engine.build_matrix(interaction_data)
-        logger.info("Initial matrix build complete.")
+        product_catalog = await fetch_product_catalog()
+        engine.build_matrix(interaction_data, product_catalog)
+        logger.info("Initial hybrid matrix build complete.")
     except Exception as e:
         logger.warning(
             "Initial data fetch failed (smarty-commerce may not be running yet): %s. "
@@ -80,10 +82,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Smarty Commerce Recommendation Service",
     description=(
-        "Item-to-Item Collaborative Filtering microservice for Smarty Commerce. "
-        "Computes product similarity from purchase, wishlist, and cart interaction data."
+        "Hybrid Content-Based + Item-to-Item Collaborative Filtering microservice "
+        "for Smarty Commerce. Computes product similarity from purchase, wishlist, "
+        "and cart interaction data combined with product attributes (category, brand, price)."
     ),
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan,
 )
 

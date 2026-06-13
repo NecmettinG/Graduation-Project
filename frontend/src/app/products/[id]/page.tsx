@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchCoreApi, fetchRecApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/Button";
 import { ProductCard } from "@/components/ProductCard";
@@ -61,6 +62,7 @@ export default function ProductDetailPage() {
   }, [id]);
 
   const { user } = useAuth();
+  const { refreshCart } = useCart();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -82,6 +84,7 @@ export default function ProductDetailPage() {
         })
       });
       toast(`${product.productName} added to cart!`, "success");
+      refreshCart();
     } catch (err) {
       console.error(err);
       toast("Failed to add to cart.", "error");

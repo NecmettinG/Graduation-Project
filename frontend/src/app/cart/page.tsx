@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { fetchCoreApi } from "@/lib/api";
 import { Button } from "@/components/Button";
@@ -12,6 +13,7 @@ import styles from "./page.module.css";
 
 export default function CartPage() {
   const { user, loading: authLoading } = useAuth();
+  const { refreshCart } = useCart();
   const { toast } = useToast();
   const router = useRouter();
   
@@ -54,6 +56,7 @@ export default function CartPage() {
         requireAuth: true
       });
       setCartItems(prev => prev.filter(item => (item.cartItemId || item.id) !== itemId));
+      refreshCart();
     } catch (e) {
       toast("Failed to remove item.", "error");
     }
@@ -73,6 +76,7 @@ export default function CartPage() {
         })
       });
       setCartItems(prev => prev.map(item => (item.cartItemId || item.id) === itemId ? { ...item, quantity: newQty } : item));
+      refreshCart();
     } catch (err) {
       toast("Failed to update quantity.", "error");
     }

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { usePathname } from "next/navigation";
 import styles from "./Navbar.module.css";
 
 export function Navbar() {
   const { user, logout, loading } = useAuth();
+  const { cartCount } = useCart();
   const pathname = usePathname();
 
   if (pathname.startsWith("/admin")) return null;
@@ -20,7 +22,12 @@ export function Navbar() {
 
         <nav className={styles.navLinks}>
           <Link href="/products" className={styles.navLink}>Products</Link>
-          <Link href="/cart" className={styles.navLink}>Cart</Link>
+          <Link href="/cart" className={styles.cartLink}>
+            Cart
+            {cartCount > 0 && (
+              <span className={styles.cartBadge}>{cartCount > 99 ? "99+" : cartCount}</span>
+            )}
+          </Link>
           
           {!loading && (
             user ? (

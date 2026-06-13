@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
@@ -11,6 +12,7 @@ import { fetchCoreApi } from "@/lib/api";
 
 export default function CheckoutPage() {
   const { user, loading: authLoading } = useAuth();
+  const { refreshCart } = useCart();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -116,6 +118,7 @@ export default function CheckoutPage() {
       });
 
       setSuccess(true);
+      refreshCart();
       setTimeout(() => {
         router.push("/orders");
       }, 3000);

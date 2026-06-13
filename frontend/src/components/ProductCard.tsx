@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "./Button";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { fetchCoreApi } from "@/lib/api";
 import styles from "./ProductCard.module.css";
@@ -20,6 +21,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { user } = useAuth();
+  const { refreshCart } = useCart();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -41,6 +43,7 @@ export function ProductCard({ product }: ProductCardProps) {
         })
       });
       toast(`${product.productName} added to cart!`, "success");
+      refreshCart();
     } catch (err) {
       console.error(err);
       toast("Failed to add to cart.", "error");

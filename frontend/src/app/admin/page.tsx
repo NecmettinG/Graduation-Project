@@ -31,14 +31,31 @@ export default function AdminDashboard() {
   async function loadDashboard() {
     setLoading(true);
     try {
-      const [usersData, productsData, ordersData] = await Promise.all([
-        fetchCoreApi("/users?page=1&limit=1000", { requireAuth: true }).catch(() => []),
-        fetchCoreApi("/products?page=1&limit=1000").catch(() => []),
-        fetchCoreApi("/orders?page=1&limit=1000", { requireAuth: true }).catch(() => []),
+      // Phase 1: Fetch lightweight counts + engine health in parallel
+      // Users and products are small payloads — just need .length
+      const [usersData, productsData, healthResult] = await Promise.all([
+        fetchCoreApi("/users?page=1&limit=100", { requireAuth: true }).catch(() => []),
+        fetchCoreApi("/products?page=1&limit=100").catch(() => []),
+        fetchRecApi("/health").catch(() => null),
       ]);
 
       const users = Array.isArray(usersData) ? usersData : (usersData?.content || []);
       const products = Array.isArray(productsData) ? productsData : (productsData?.content || []);
+      setEngineOnline(!!healthResult?.engineReady);
+
+      // Show partial stats immediately (KPI cards render fast)
+      setStats({
+        totalUsers: users.length,
+        totalProducts: products.length,
+        totalOrders: 0,
+        totalRevenue: 0,
+        recentOrders: [],
+        ordersByStatus: {},
+      });
+      setLoading(false);
+
+      // Phase 2: Fetch orders (heaviest — contains nested orderItems with product data)
+      const ordersData = await fetchCoreApi("/orders?page=1&limit=100", { requireAuth: true }).catch(() => []);
       const orders = Array.isArray(ordersData) ? ordersData : (ordersData?.content || []);
 
       const totalRevenue = orders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0);
@@ -55,25 +72,16 @@ export default function AdminDashboard() {
         return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
       });
 
-      setStats({
-        totalUsers: users.length,
-        totalProducts: products.length,
+      setStats(prev => prev ? {
+        ...prev,
         totalOrders: orders.length,
         totalRevenue,
         recentOrders: sortedOrders.slice(0, 5),
         ordersByStatus,
-      });
+      } : prev);
 
-      // Check recommendation engine health
-      try {
-        const health = await fetchRecApi("/health");
-        setEngineOnline(!!health?.engineReady);
-      } catch {
-        setEngineOnline(false);
-      }
     } catch (err) {
       console.error("Failed to load dashboard", err);
-    } finally {
       setLoading(false);
     }
   }

@@ -107,8 +107,7 @@ public class OrderServiceImpl implements OrderService {
             if (orderDetails.getPaymentToken() == null || orderDetails.getPaymentToken().isEmpty()) {
                 throw new OrderServiceException("Payment token is required for digital payments.");
             }
-            // In a real scenario, you'd integrate Stripe/PayPal here.
-            // Simulate successful charge
+            // Stripe/PayPal/Iyzico here.
             orderEntity.setPaymentStatus(PaymentStatus.PAID);
         } else if (orderDetails.getPaymentMethod() == PaymentMethod.UPON_DELIVERY) {
             orderEntity.setPaymentStatus(PaymentStatus.UNPAID);
@@ -128,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new OrderServiceException(ErrorMessages.NOT_ENOUGH_STOCK.getErrorMessage() + ": " + product.getProductName());
             }
 
-            // Deduct stock
+            // Decrease stock
             product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "./Button";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { fetchCoreApi } from "@/lib/api";
 import styles from "./ProductCard.module.css";
 
@@ -20,11 +21,12 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent link navigation if button clicked
     if (!user) {
-      alert("Please login to add items to your cart.");
+      toast("Please login to add items to your cart.", "info");
       router.push("/login");
       return;
     }
@@ -38,10 +40,10 @@ export function ProductCard({ product }: ProductCardProps) {
           quantity: 1
         })
       });
-      alert(`${product.productName} added to cart!`);
+      toast(`${product.productName} added to cart!`, "success");
     } catch (err) {
       console.error(err);
-      alert("Failed to add to cart.");
+      toast("Failed to add to cart.", "error");
     }
   };
 
@@ -57,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className={styles.details}>
           <h3 className={styles.title}>{product.productName}</h3>
-          <p className={styles.price}>${product.price.toFixed(2)}</p>
+          <p className={styles.price}>₺{product.price.toFixed(2)}</p>
         </div>
       </Link>
       <div className={styles.actions}>

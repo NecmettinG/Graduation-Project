@@ -103,11 +103,11 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
-        //userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(publicUserId));
-        userEntity.setEmailVerificationToken(null);
+        userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(publicUserId));
+        //userEntity.setEmailVerificationToken(null);
 
-        //userEntity.setEmailVerificationStatus(false);
-        userEntity.setEmailVerificationStatus(true);
+        userEntity.setEmailVerificationStatus(false);
+        //userEntity.setEmailVerificationStatus(true);
 
 
         Collection<RoleEntity> roleEntities = new HashSet<>();
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
         UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
 
 
-        //amazonSES.verifyEmail(returnValue);
+        amazonSES.verifyEmail(returnValue);
 
         return returnValue;
     }

@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { fetchCoreApi } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/Button";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchProducts();
@@ -30,7 +32,7 @@ export default function AdminProducts() {
       await fetchCoreApi(`/products/${id}`, { method: "DELETE", requireAuth: true });
       setProducts(prev => prev.filter(p => p.productId !== id));
     } catch (err) {
-      alert("Failed to delete product");
+      toast("Failed to delete product.", "error");
     }
   }
 
@@ -72,7 +74,7 @@ export default function AdminProducts() {
                     )}
                   </td>
                   <td style={{ padding: "1rem", fontWeight: 500, color: "var(--text-primary)" }}>{p.productName}</td>
-                  <td style={{ padding: "1rem", color: "var(--text-secondary)" }}>${p.price?.toFixed(2)}</td>
+                  <td style={{ padding: "1rem", color: "var(--text-secondary)" }}>₺{p.price?.toFixed(2)}</td>
                   <td style={{ padding: "1rem", color: "var(--text-secondary)" }}>{p.stock}</td>
                   <td style={{ padding: "1rem" }}>
                     <div style={{ display: "flex", gap: "0.5rem" }}>

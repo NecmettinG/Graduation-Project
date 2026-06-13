@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 import { fetchCoreApi } from "@/lib/api";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductGridSkeleton } from "@/components/Skeleton";
 
 export default function WishlistPage() {
   const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const [wishlistItems, setWishlistItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,11 +47,15 @@ export default function WishlistPage() {
         return id !== productId;
       }));
     } catch (err) {
-      alert("Failed to remove from wishlist");
+      toast("Failed to remove from wishlist.", "error");
     }
   };
 
-  if (authLoading || loading) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Loading wishlist...</div>;
+  if (authLoading || loading) return (
+    <div className="container" style={{ padding: "4rem 1.5rem" }}>
+      <ProductGridSkeleton count={4} />
+    </div>
+  );
 
   return (
     <div className="container" style={{ padding: "4rem 1.5rem", minHeight: "60vh" }}>

@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { fetchCoreApi } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchUsers();
@@ -29,7 +31,7 @@ export default function AdminUsers() {
       await fetchCoreApi(`/users/${id}`, { method: "DELETE", requireAuth: true });
       setUsers(prev => prev.filter(u => u.userId !== id));
     } catch (err) {
-      alert("Failed to delete user");
+      toast("Failed to delete user.", "error");
     }
   }
 

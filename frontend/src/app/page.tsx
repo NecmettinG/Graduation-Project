@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { fetchCoreApi, fetchRecApi } from "@/lib/api";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductGridSkeleton } from "@/components/Skeleton";
 import { Button } from "@/components/Button";
 import styles from "./page.module.css";
 
@@ -158,7 +159,7 @@ export default function Home() {
           </div>
 
           {loadingRecs ? (
-            <div className={styles.loadingState}>Analyzing your preferences...</div>
+            <ProductGridSkeleton count={4} />
           ) : recommendations.length > 0 ? (
             <div className={styles.productGrid}>
               {recommendations.map((product, idx) => (

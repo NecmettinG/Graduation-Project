@@ -71,7 +71,7 @@ export default function AdminOrders() {
                       {o.orderStatus}
                     </span>
                   </td>
-                  <td style={{ padding: "1rem", fontWeight: 600, color: "var(--text-primary)" }}>${o.totalAmount?.toFixed(2)}</td>
+                  <td style={{ padding: "1rem", fontWeight: 600, color: "var(--text-primary)" }}>₺{o.totalAmount?.toFixed(2)}</td>
                   <td style={{ padding: "1rem", color: "var(--text-secondary)", fontSize: "0.875rem" }}>
                     {o.paymentMethod} <br/>
                     ({o.paymentStatus})

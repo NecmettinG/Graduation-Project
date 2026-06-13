@@ -76,7 +76,7 @@ export default function RegisterPage() {
       setSuccess(true);
       setTimeout(() => {
         router.push("/login");
-      }, 3000);
+      }, 5000);
       
     } catch (err: any) {
       setError(err.message || "Failed to create account. Please try again.");
@@ -89,9 +89,14 @@ export default function RegisterPage() {
     return (
       <div className={styles.container}>
         <div className={`glass-panel ${styles.formCard}`} style={{ textAlign: "center" }}>
-          <h1 className={styles.title} style={{ color: "#10B981" }}>Success!</h1>
-          <p className={styles.subtitle}>Your account has been created successfully.</p>
-          <p style={{ color: "var(--text-secondary)" }}>Redirecting to login...</p>
+          <h1 className={styles.title} style={{ color: "#10B981" }}>Account Created!</h1>
+          <p className={styles.subtitle}>A verification email has been sent to your inbox.</p>
+          <div style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: "8px", padding: "1rem", marginBottom: "1.5rem" }}>
+            <p style={{ color: "#1E40AF", fontSize: "0.9rem", fontWeight: 500, margin: 0 }}>
+              📧 Please check your email and click the verification link to activate your account.
+            </p>
+          </div>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>Redirecting to login in 5 seconds...</p>
         </div>
       </div>
     );

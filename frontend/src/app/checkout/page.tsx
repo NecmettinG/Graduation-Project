@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import styles from "./page.module.css";
@@ -10,6 +11,7 @@ import { fetchCoreApi } from "@/lib/api";
 
 export default function CheckoutPage() {
   const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
 
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -120,7 +122,7 @@ export default function CheckoutPage() {
       
     } catch (err) {
       console.error(err);
-      alert("Failed to place order. Please try again.");
+      toast("Failed to place order. Please try again.", "error");
     } finally {
       setLoading(false);
     }

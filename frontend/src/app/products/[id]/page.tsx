@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchCoreApi, fetchRecApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/Button";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductDetailSkeleton } from "@/components/Skeleton";
 import styles from "./page.module.css";
 
 export default function ProductDetailPage() {
@@ -19,6 +21,7 @@ export default function ProductDetailPage() {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -59,10 +62,11 @@ export default function ProductDetailPage() {
 
   const { user } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleAddToCart = async () => {
     if (!user) {
-      alert("Please login to add items to your cart.");
+      toast("Please login to add items to your cart.", "info");
       router.push("/login");
       return;
     }
@@ -77,10 +81,10 @@ export default function ProductDetailPage() {
           quantity: 1
         })
       });
-      alert(`${product.productName} added to cart!`);
+      toast(`${product.productName} added to cart!`, "success");
     } catch (err) {
       console.error(err);
-      alert("Failed to add to cart");
+      toast("Failed to add to cart.", "error");
     } finally {
       setAddingToCart(false);
     }
@@ -88,7 +92,7 @@ export default function ProductDetailPage() {
 
   const handleWishlist = async () => {
     if (!user) {
-      alert("Please login to add items to your wishlist.");
+      toast("Please login to add items to your wishlist.", "info");
       router.push("/login");
       return;
     }
@@ -98,17 +102,17 @@ export default function ProductDetailPage() {
         method: "POST",
         requireAuth: true
       });
-      alert(`${product.productName} added to wishlist!`);
+      toast(`${product.productName} added to wishlist!`, "success");
     } catch (err) {
       console.error(err);
-      alert("Failed to add to wishlist");
+      toast("Failed to add to wishlist.", "error");
     }
   };
 
   const handlePostComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert("Please login to post a comment.");
+      toast("Please login to post a comment.", "info");
       router.push("/login");
       return;
     }
@@ -128,16 +132,16 @@ export default function ProductDetailPage() {
       if (Array.isArray(fetchedComments)) {
         setComments(fetchedComments);
       }
-      alert("Comment posted successfully!");
+      toast("Comment posted successfully!", "success");
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Failed to post comment.");
+      toast(err.message || "Failed to post comment.", "error");
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
-  if (loading) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Loading...</div>;
+  if (loading) return <ProductDetailSkeleton />;
   if (!product) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Product not found</div>;
 
   return (
@@ -145,7 +149,26 @@ export default function ProductDetailPage() {
       <div className={`container ${styles.productLayout}`}>
         <div className={styles.imageGallery}>
           {product.imageUrls && product.imageUrls.length > 0 ? (
-            <img src={product.imageUrls[0]} alt={product.productName} className={styles.mainImage} />
+            <>
+              <img
+                src={product.imageUrls[selectedImage] || product.imageUrls[0]}
+                alt={product.productName}
+                className={styles.mainImage}
+              />
+              {product.imageUrls.length > 1 && (
+                <div className={styles.thumbnailStrip}>
+                  {product.imageUrls.map((url: string, idx: number) => (
+                    <button
+                      key={idx}
+                      className={`${styles.thumbnail} ${idx === selectedImage ? styles.thumbnailActive : ""}`}
+                      onClick={() => setSelectedImage(idx)}
+                    >
+                      <img src={url} alt={`${product.productName} ${idx + 1}`} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           ) : (
             <div className={styles.placeholderImage}>No Image Available</div>
           )}
@@ -153,11 +176,29 @@ export default function ProductDetailPage() {
         
         <div className={styles.productInfo}>
           <h1 className={styles.title}>{product.productName}</h1>
-          <div className={styles.price}>${product.price?.toFixed(2)}</div>
+          {product.category && (
+            <span className={styles.categoryBadge}>{product.category.categoryName}</span>
+          )}
+          <div className={styles.price}>₺{product.price?.toFixed(2)}</div>
           
           <div className={styles.description}>
             {product.description || "No description provided for this premium item. Crafted with excellence."}
           </div>
+
+          {/* Product Attributes */}
+          {product.attributes && Object.keys(product.attributes).length > 0 && (
+            <div className={styles.attributes}>
+              <h3 className={styles.attributesTitle}>Product Details</h3>
+              <div className={styles.attributeGrid}>
+                {Object.entries(product.attributes).map(([key, value]) => (
+                  <div key={key} className={styles.attributeRow}>
+                    <span className={styles.attributeKey}>{key}</span>
+                    <span className={styles.attributeValue}>{String(value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           <div className={styles.actions}>
             <Button onClick={handleAddToCart} disabled={addingToCart} className={styles.addBtn}>

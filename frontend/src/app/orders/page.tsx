@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { fetchCoreApi } from "@/lib/api";
+import { OrderSkeleton } from "@/components/Skeleton";
 
 export default function OrdersPage() {
   const { user, loading: authLoading } = useAuth();
@@ -39,7 +40,13 @@ export default function OrdersPage() {
     fetchOrders();
   }, [user, authLoading, router]);
 
-  if (authLoading || loading) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Loading orders...</div>;
+  if (authLoading || loading) return (
+    <div className="container" style={{ padding: "4rem 0", display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <OrderSkeleton />
+      <OrderSkeleton />
+      <OrderSkeleton />
+    </div>
+  );
 
   return (
     <div className="container" style={{ padding: "4rem 1.5rem", minHeight: "60vh" }}>
@@ -79,7 +86,7 @@ export default function OrdersPage() {
                       return (
                         <li key={i} style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", fontSize: "0.95rem" }}>
                           <span>{item.quantity}x {product.productName || "Product"}</span>
-                          <span>${(product.price * item.quantity).toFixed(2)}</span>
+                          <span>₺{(product.price * item.quantity).toFixed(2)}</span>
                         </li>
                       );
                     })}
@@ -92,7 +99,7 @@ export default function OrdersPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px dashed var(--border-color)", paddingTop: "1rem" }}>
                 <span style={{ color: "var(--text-secondary)" }}>Shipping to: {order.shippingAddress || "Default Address"}</span>
                 <div>
-                  Total Amount: <strong style={{ color: "var(--accent-primary)", fontSize: "1.25rem", marginLeft: "0.5rem" }}>${order.totalAmount?.toFixed(2) || "0.00"}</strong>
+                  Total Amount: <strong style={{ color: "var(--accent-primary)", fontSize: "1.25rem", marginLeft: "0.5rem" }}>₺{order.totalAmount?.toFixed(2) || "0.00"}</strong>
                 </div>
               </div>
             </div>

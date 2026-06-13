@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { fetchCoreApi } from "@/lib/api";
 import { Button } from "@/components/Button";
+import { CartSkeleton } from "@/components/Skeleton";
 import styles from "./page.module.css";
 
 export default function CartPage() {
   const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   
   const [cartItems, setCartItems] = useState<any[]>([]);
@@ -52,7 +55,7 @@ export default function CartPage() {
       });
       setCartItems(prev => prev.filter(item => (item.cartItemId || item.id) !== itemId));
     } catch (e) {
-      alert("Failed to remove item");
+      toast("Failed to remove item.", "error");
     }
   };
 
@@ -71,7 +74,7 @@ export default function CartPage() {
       });
       setCartItems(prev => prev.map(item => (item.cartItemId || item.id) === itemId ? { ...item, quantity: newQty } : item));
     } catch (err) {
-      alert("Failed to update quantity");
+      toast("Failed to update quantity.", "error");
     }
   };
 
@@ -84,7 +87,7 @@ export default function CartPage() {
     }, 0);
   };
 
-  if (authLoading || loading) return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Loading your cart...</div>;
+  if (authLoading || loading) return <CartSkeleton />;
 
   return (
     <div className={styles.container}>
@@ -113,7 +116,7 @@ export default function CartPage() {
                     </div>
                     <div className={styles.itemDetails}>
                       <h3>{product.productName}</h3>
-                      <p className={styles.price}>${price.toFixed(2)}</p>
+                      <p className={styles.price}>₺{price.toFixed(2)}</p>
                       <div className={styles.qtyControls} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
                         <button 
                           onClick={() => handleUpdateQuantity(item.cartItemId || item.id, qty, -1, product)}
@@ -138,7 +141,7 @@ export default function CartPage() {
               <h2>Order Summary</h2>
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
-                <span>${calculateTotal().toFixed(2)}</span>
+                <span>₺{calculateTotal().toFixed(2)}</span>
               </div>
               <div className={styles.summaryRow}>
                 <span>Shipping</span>
@@ -147,7 +150,7 @@ export default function CartPage() {
               <div className={styles.divider}></div>
               <div className={styles.summaryRow} style={{ fontWeight: 700, fontSize: "1.25rem", color: "var(--accent-primary)" }}>
                 <span>Total</span>
-                <span>${calculateTotal().toFixed(2)}</span>
+                <span>₺{calculateTotal().toFixed(2)}</span>
               </div>
               
               <Link href="/checkout" className={`btn btn-primary ${styles.checkoutBtn}`}>

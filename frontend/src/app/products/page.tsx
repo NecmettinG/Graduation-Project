@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchCoreApi } from "@/lib/api";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductGridSkeleton } from "@/components/Skeleton";
 import styles from "./page.module.css";
 
 export default function ProductsPage() {
@@ -144,7 +145,7 @@ export default function ProductsPage() {
         </div>
 
         {loading ? (
-          <div className={styles.loading}>Loading products...</div>
+          <ProductGridSkeleton count={12} />
         ) : (
           <>
             <div className={styles.grid}>

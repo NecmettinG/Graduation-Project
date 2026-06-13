@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
+import { Skeleton } from "@/components/Skeleton";
 import { fetchCoreApi } from "@/lib/api";
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -57,7 +60,23 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
   if (loading || !user) {
-    return <div className="container" style={{ padding: "4rem 0", textAlign: "center" }}>Loading...</div>;
+    return (
+      <div className="container" style={{ padding: "4rem 1.5rem", maxWidth: "720px", margin: "0 auto" }}>
+        <Skeleton width="40%" height="2rem" />
+        <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <Skeleton height="3rem" />
+          <Skeleton height="3rem" />
+          <Skeleton width="60%" height="3rem" />
+        </div>
+        <div style={{ marginTop: "2.5rem" }}>
+          <Skeleton width="35%" height="1.5rem" />
+          <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <Skeleton height="4rem" />
+            <Skeleton height="4rem" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleProfileSave = async () => {
@@ -74,10 +93,10 @@ export default function ProfilePage() {
         })
       });
       setIsEditing(false);
-      alert("Profile updated successfully!");
+      toast("Profile updated successfully!", "success");
       // Note: In a real app, we'd also update the AuthContext state here
     } catch (err) {
-      alert("Failed to update profile");
+      toast("Failed to update profile.", "error");
     } finally {
       setIsSavingProfile(false);
     }
@@ -86,7 +105,7 @@ export default function ProfilePage() {
   const handlePasswordSave = async () => {
     if (!passwordData.password) return;
     if (passwordData.password !== passwordData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast("Passwords do not match!", "warning");
       return;
     }
     
@@ -103,9 +122,9 @@ export default function ProfilePage() {
         })
       });
       setPasswordData({ password: "", confirmPassword: "" });
-      alert("Password updated successfully!");
+      toast("Password updated successfully!", "success");
     } catch (err) {
-      alert("Failed to update password");
+      toast("Failed to update password.", "error");
     } finally {
       setIsSavingPassword(false);
     }
@@ -113,7 +132,7 @@ export default function ProfilePage() {
 
   const handleAddAddress = async () => {
     if (!newAddress.streetName || !newAddress.city || !newAddress.country) {
-      alert("Please fill in all required fields (Street, City, Country).");
+      toast("Please fill in all required fields (Street, City, Country).", "warning");
       return;
     }
     
@@ -126,9 +145,9 @@ export default function ProfilePage() {
       setIsAddingAddress(false);
       setNewAddress({ streetName: "", city: "", postalCode: "", country: "", type: "Shipping" });
       if (user) loadAddresses(user.userId);
-      alert("Address added successfully!");
+      toast("Address added successfully!", "success");
     } catch (err) {
-      alert("Failed to add address.");
+      toast("Failed to add address.", "error");
     }
   };
 
@@ -141,7 +160,7 @@ export default function ProfilePage() {
       });
       if (user) loadAddresses(user.userId);
     } catch (err) {
-      alert("Failed to delete address.");
+      toast("Failed to delete address.", "error");
     }
   };
 

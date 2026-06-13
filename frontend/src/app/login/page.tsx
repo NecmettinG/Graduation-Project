@@ -93,7 +93,7 @@ export default function LoginPage() {
           />
           
           <div className={styles.forgotPassword}>
-            <a href="#" className={styles.link}>Forgot your password?</a>
+            <Link href="/forgot-password" className={styles.link}>Forgot your password?</Link>
           </div>
 
           <Button type="submit" fullWidth disabled={loading}>

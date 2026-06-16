@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class AmazonSES {
 
     //This is the email we verified for Amazon SES.
-    final String FROM = "necmettingedikli611@gmail.com";
+    final String FROM = "support@smartycommerce.me";
 
     // The subject line for the email.
     final String SUBJECT = "One last step to complete your registration to Smarty-Commerce";

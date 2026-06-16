@@ -28,7 +28,7 @@ export default function LoginPage() {
       // but let's assume it returns { userId, token } or we can fetch it.
       // Based on standard Spring JWT, it might be in headers: "Authorization"
       
-      const response = await fetch("http://localhost:8080/smarty-commerce/users/login", {
+      const response = await fetch("http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:8080/smarty-commerce/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

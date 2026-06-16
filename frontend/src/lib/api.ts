@@ -1,5 +1,5 @@
-const CORE_API_URL = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:8080/smarty-commerce';
-const REC_API_URL = process.env.NEXT_PUBLIC_REC_API_URL || 'http://localhost:8000';
+const CORE_API_URL = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:8080/smarty-commerce';
+const REC_API_URL = process.env.NEXT_PUBLIC_REC_API_URL || 'http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:8000';
 
 export function getAuthToken(): string | null {
   if (typeof window !== 'undefined') {
@@ -26,7 +26,6 @@ interface FetchOptions extends RequestInit {
 
 async function baseFetch(url: string, options: FetchOptions = {}) {
   const { requireAuth = false, headers, ...restOptions } = options;
-  
   const reqHeaders = new Headers(headers);
   reqHeaders.set('Content-Type', 'application/json');
   reqHeaders.set('Accept', 'application/json');

@@ -1,8 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '.env'))
+load_dotenv()
 
 SMARTY_COMMERCE_BASE_URL: str = os.getenv("SMARTY_COMMERCE_BASE_URL", "http://localhost:8080/smarty-commerce")
 TOKEN_SECRET: str = os.getenv("TOKEN_SECRET", "")

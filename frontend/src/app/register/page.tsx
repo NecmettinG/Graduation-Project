@@ -58,7 +58,7 @@ export default function RegisterPage() {
         });
       }
 
-      const response = await fetch("http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:8080/smarty-commerce/users", {
+      const response = await fetch("/api/core/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -1,5 +1,9 @@
-const CORE_API_URL = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:8080/smarty-commerce';
-const REC_API_URL = process.env.NEXT_PUBLIC_REC_API_URL || 'http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:8000';
+// In production, requests go through Next.js rewrites (no CORS).
+// The rewrites in next.config.ts proxy:
+//   /api/core/* → CORE_API (Java backend)
+//   /api/rec/*  → REC_API  (Python recommendation service)
+const CORE_API_PREFIX = "/api/core";
+const REC_API_PREFIX = "/api/rec";
 
 export function getAuthToken(): string | null {
   if (typeof window !== 'undefined') {
@@ -36,7 +40,6 @@ async function baseFetch(url: string, options: FetchOptions = {}) {
       reqHeaders.set('Authorization', `Bearer ${token}`);
     } else {
       console.warn("Auth required but no token found in localStorage.");
-      // Optional: handle unauthorized redirection or throwing here
     }
   }
 
@@ -66,16 +69,18 @@ async function baseFetch(url: string, options: FetchOptions = {}) {
 
 /**
  * Fetch from Smarty Commerce Core Backend (Java)
+ * Proxied through Next.js: /api/core/* → backend
  */
 export async function fetchCoreApi(endpoint: string, options?: FetchOptions) {
-  const url = `${CORE_API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = `${CORE_API_PREFIX}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   return baseFetch(url, options);
 }
 
 /**
  * Fetch from Recommendation Service (Python)
+ * Proxied through Next.js: /api/rec/* → recommendation service
  */
 export async function fetchRecApi(endpoint: string, options?: FetchOptions) {
-  const url = `${REC_API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = `${REC_API_PREFIX}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   return baseFetch(url, options);
 }

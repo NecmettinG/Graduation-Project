@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchCoreApi } from "@/lib/api";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGridSkeleton } from "@/components/Skeleton";
 import styles from "./page.module.css";
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -186,5 +186,13 @@ export default function ProductsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="container" style={{ padding: "4rem 1.5rem" }}><ProductGridSkeleton count={12} /></div>}>
+      <ProductsPageContent />
+    </Suspense>
   );
 }

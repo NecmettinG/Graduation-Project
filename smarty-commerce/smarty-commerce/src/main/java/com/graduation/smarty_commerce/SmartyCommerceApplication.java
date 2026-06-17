@@ -10,14 +10,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
 @EnableScheduling
-public class SmartyCommerceApplication extends SpringBootServletInitializer {
+public class SmartyCommerceApplication{
 
+    /*
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 
         return application.sources(SmartyCommerceApplication.class);
     }
 
+     */
 	public static void main(String[] args) {
 		SpringApplication.run(SmartyCommerceApplication.class, args);
 	}

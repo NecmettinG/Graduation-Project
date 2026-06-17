@@ -63,7 +63,7 @@ export default function Home() {
         if (fetchedCats.length > 0) {
           // Filter out duplicate categories by categoryId (or categoryName if id is missing)
           const uniqueCatsMap = new Map();
-          fetchedCats.forEach(c => {
+          fetchedCats.forEach((c: any) => {
             const key = c.categoryId || c.categoryName;
             if (key) uniqueCatsMap.set(key, c);
           });

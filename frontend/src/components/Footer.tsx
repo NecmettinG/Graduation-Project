@@ -21,12 +21,12 @@ export function Footer() {
           <div className={styles.linkColumn}>
             <h4>Shop</h4>
             <Link href="/products">All Products</Link>
-            <Link href="/categories">Categories</Link>
+            <Link href="/wishlist">Wishlist</Link>
           </div>
           <div className={styles.linkColumn}>
-            <h4>Support</h4>
-            <Link href="/faq">FAQ</Link>
-            <Link href="/contact">Contact Us</Link>
+            <h4>Account</h4>
+            <Link href="/orders">My Orders</Link>
+            <Link href="/profile">Profile</Link>
           </div>
         </div>
       </div>

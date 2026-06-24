@@ -73,7 +73,7 @@
             }
 
             function verifyToken(tokenValue){
-                $.get('http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:8080/smarty-commerce/users/email-verification', {token: tokenValue})
+                $.get('http://localhost:8080/smarty-commerce/users/email-verification', {token: tokenValue})
                     .done(function (response){
                         $("#loading").hide();
                         if(response["operationResult"] === "SUCCESS"){
@@ -103,7 +103,7 @@
         <div class="icon success">✓</div>
         <h1>Success!</h1>
         <p>Your email has been successfully verified. You can now login to your account.</p>
-        <a href="http://ec2-63-182-150-7.eu-central-1.compute.amazonaws.com:3000/login" class="btn">Go to Login</a>
+        <a href="http://localhost:3000/login" class="btn">Go to Login</a>
     </div>
     
     <div id="not-successful-result" style="display:none">
